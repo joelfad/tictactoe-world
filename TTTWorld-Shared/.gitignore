@@ -1,0 +1,8 @@
+# JSON Library JAR
+/json.jar
+
+# Eclipse files
+/.settings/
+/.classpath
+/.project
+/bin/

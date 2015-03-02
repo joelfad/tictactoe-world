@@ -1,0 +1,12 @@
+# JGoodies FormLayout JAR and source
+/forms-1.3.0-src.zip
+/forms-1.3.0.jar
+
+# Configuration files
+/hosts.txt
+
+# Eclipse files
+/.settings/
+/.classpath
+/.project
+/bin/

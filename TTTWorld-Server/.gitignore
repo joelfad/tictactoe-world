@@ -1,0 +1,10 @@
+# Configuration files
+/accounts.db
+/server.crt
+/server.pk8
+
+# Eclipse files
+/.settings/
+/.classpath
+/.project
+/bin/
