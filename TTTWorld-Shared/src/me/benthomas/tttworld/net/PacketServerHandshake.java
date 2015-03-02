@@ -13,7 +13,7 @@ public class PacketServerHandshake extends Packet {
     private boolean registerAllowed;
     
     private byte[] publicKey;
-
+    
     public PacketServerHandshake() {
         super(PACKET_ID);
     }
@@ -38,7 +38,7 @@ public class PacketServerHandshake extends Packet {
     public byte[] getPublicKey() {
         return this.publicKey;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -55,7 +55,7 @@ public class PacketServerHandshake extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);

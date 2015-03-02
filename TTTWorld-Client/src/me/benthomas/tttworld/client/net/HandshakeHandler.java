@@ -36,11 +36,13 @@ public class HandshakeHandler implements PacketHandler<PacketServerHandshake> {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (KnownHosts.doPrompt(null, HandshakeHandler.this.server.getHostName(), Crypto.calculateSHA1(packet.getPublicKey()))) {
+                if (KnownHosts.doPrompt(null, HandshakeHandler.this.server.getHostName(),
+                        Crypto.calculateSHA1(packet.getPublicKey()))) {
                     byte[] key = HandshakeHandler.this.server.generateEncryptionKey();
                     
                     try {
-                        HandshakeHandler.this.server.sendPacket(new PacketStartEncrypt(Crypto.encryptAsymmetric(key, HandshakeHandler.this.decodePublicKey(packet.getPublicKey()))));
+                        HandshakeHandler.this.server.sendPacket(new PacketStartEncrypt(Crypto.encryptAsymmetric(key,
+                                HandshakeHandler.this.decodePublicKey(packet.getPublicKey()))));
                     } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException
                             | NoSuchAlgorithmException e) {
                         HandshakeHandler.this.server.disconnect("Error securing encryption key");
@@ -50,10 +52,12 @@ public class HandshakeHandler implements PacketHandler<PacketServerHandshake> {
                     HandshakeHandler.this.server.setEncryptionKey(key);
                     
                     if (TTTWConnection.DEBUG_NO_ENCRYPTION) {
-                        JOptionPane.showMessageDialog(null, "Encryption is disabled for debugging. Be careful!", "Warning", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Encryption is disabled for debugging. Be careful!", "Warning",
+                                JOptionPane.WARNING_MESSAGE);
                     }
                     
-                    HandshakeHandler.this.server.setHandler(PacketAuthResult.class, new AuthResultHandler(HandshakeHandler.this.server));
+                    HandshakeHandler.this.server.setHandler(PacketAuthResult.class, new AuthResultHandler(
+                            HandshakeHandler.this.server));
                     HandshakeHandler.this.server.getFrame().displayLoginDialog();
                 } else {
                     HandshakeHandler.this.server.disconnect("Host not trusted");

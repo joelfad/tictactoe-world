@@ -26,12 +26,12 @@ public class TicTacToePanel extends JPanel {
     private static final long serialVersionUID = 1L;
     
     private Board board;
-
+    
     public void setBoard(Board board) {
         this.board = board;
         this.repaint();
     }
-
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -42,7 +42,7 @@ public class TicTacToePanel extends JPanel {
         int x = this.getWidth() / 2 - w / 2;
         int y = this.getHeight() / 2 - h / 2;
         
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
         
         g.setColor(Color.BLACK);
         g2.setStroke(new BasicStroke(LINE_WIDTH));
@@ -70,7 +70,7 @@ public class TicTacToePanel extends JPanel {
                     g.drawOval(cx, cy, CELL_SIZE, CELL_SIZE);
                 }
                 
-                if (board == null || board.getMark(c, r) == Mark.X) { 
+                if (board == null || board.getMark(c, r) == Mark.X) {
                     g.setColor(Color.BLUE);
                     g.drawLine(cx, cy, cx + CELL_SIZE, cy + CELL_SIZE);
                     g.drawLine(cx + CELL_SIZE, cy, cx, cy + CELL_SIZE);

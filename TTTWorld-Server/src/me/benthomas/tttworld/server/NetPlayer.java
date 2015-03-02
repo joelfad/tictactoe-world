@@ -54,7 +54,7 @@ public final class NetPlayer extends Player {
             // Ignore
         }
     }
-
+    
     @Override
     public void notifyLost() {
         this.notifyOver();
@@ -65,7 +65,7 @@ public final class NetPlayer extends Player {
             // Ignore
         }
     }
-
+    
     @Override
     public void notifyDrawn() {
         this.notifyOver();
@@ -81,7 +81,7 @@ public final class NetPlayer extends Player {
         this.sendUpdate(false, true);
         this.client.removeDisconnectListener(this.forfeit);
     }
-
+    
     public void handlePacket(PacketGameMove p, boolean active) {
         if (p.getX() == -1 && p.getY() == -1) {
             this.game.cancel(this);
@@ -99,5 +99,5 @@ public final class NetPlayer extends Player {
             NetPlayer.this.game.cancel(NetPlayer.this);
         }
     }
-
+    
 }

@@ -65,8 +65,7 @@ public class KnownHosts {
                 + "connected. This could be a sign that your connection is being tampered with.\n"
                 + "The fingerprint of the server you are connecting to is:\n\n" + Crypto.formatFingerprint(fingerprint) + "\n\n"
                 + "It is strongly recommended that you stop trying to connect immediately and\n"
-                + "verify that the public key change was intentional! Do you wish to continue\n"
-                + "connecting?";
+                + "verify that the public key change was intentional! Do you wish to continue\n" + "connecting?";
     }
     public static void load() throws IOException {
         KnownHosts.hosts = new HashMap<String, byte[]>();

@@ -26,7 +26,7 @@ public class PacketClientHandshake extends Packet {
     public int getMinorProtocolVersion() {
         return this.protocolVersionMinor;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -39,7 +39,7 @@ public class PacketClientHandshake extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);

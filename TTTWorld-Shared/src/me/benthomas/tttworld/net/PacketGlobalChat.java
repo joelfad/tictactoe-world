@@ -20,7 +20,7 @@ public class PacketGlobalChat extends Packet {
     public String getMessage() {
         return this.message;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -29,7 +29,7 @@ public class PacketGlobalChat extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);

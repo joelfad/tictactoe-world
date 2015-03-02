@@ -26,7 +26,7 @@ public class PacketAuthenticate extends Packet {
     public String getPassword() {
         return this.password;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -36,7 +36,7 @@ public class PacketAuthenticate extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);

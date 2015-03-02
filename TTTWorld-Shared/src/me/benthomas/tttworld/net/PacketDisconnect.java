@@ -20,7 +20,7 @@ public class PacketDisconnect extends Packet {
     public String getReason() {
         return this.reason;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -29,7 +29,7 @@ public class PacketDisconnect extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);

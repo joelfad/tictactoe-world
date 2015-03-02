@@ -24,13 +24,13 @@ public class PacketGlobalPlayerList extends Packet {
     public List<PlayerInfo> getPlayers() {
         return this.players;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
         JSONArray players = new JSONArray();
         
-        for (PlayerInfo p : this.players){
+        for (PlayerInfo p : this.players) {
             players.put(p.write());
         }
         
@@ -38,7 +38,7 @@ public class PacketGlobalPlayerList extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);
@@ -72,12 +72,12 @@ public class PacketGlobalPlayerList extends Packet {
             
             return o;
         }
-
+        
         @Override
         public int compareTo(PlayerInfo other) {
             return this.username.compareTo(other.username);
         }
-
+        
         @Override
         public String toString() {
             if (this.admin) {

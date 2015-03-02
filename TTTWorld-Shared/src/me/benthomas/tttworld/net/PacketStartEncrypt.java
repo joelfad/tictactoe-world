@@ -22,7 +22,7 @@ public class PacketStartEncrypt extends Packet {
     public byte[] getCryptKey() {
         return this.cryptKey;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -31,12 +31,12 @@ public class PacketStartEncrypt extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);
         
         this.cryptKey = Base64.getDecoder().decode(o.getString("crypt_key"));
     }
-
+    
 }

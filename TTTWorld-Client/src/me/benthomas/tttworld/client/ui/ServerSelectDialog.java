@@ -81,12 +81,12 @@ public class ServerSelectDialog extends JDialog {
             public void changedUpdate(DocumentEvent e) {
                 changed();
             }
-
+            
             @Override
             public void insertUpdate(DocumentEvent e) {
                 changed();
             }
-
+            
             @Override
             public void removeUpdate(DocumentEvent e) {
                 changed();

@@ -31,7 +31,7 @@ public class TTTWServerConnection extends TTTWConnection {
     public String getHostName() {
         return this.hostname;
     }
-
+    
     @Override
     public synchronized void sendPacket(Packet p) {
         try {

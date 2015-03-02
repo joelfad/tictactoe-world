@@ -36,7 +36,7 @@ public class PacketChallenge extends Packet {
     public long getTimeout() {
         return this.timeout;
     }
-
+    
     @Override
     public JSONObject write() {
         JSONObject o = super.write();
@@ -47,7 +47,7 @@ public class PacketChallenge extends Packet {
         
         return o;
     }
-
+    
     @Override
     public void read(JSONObject o) {
         super.read(o);

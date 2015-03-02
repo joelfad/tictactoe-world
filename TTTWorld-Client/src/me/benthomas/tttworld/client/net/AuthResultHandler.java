@@ -29,8 +29,9 @@ public class AuthResultHandler implements PacketHandler<PacketAuthResult> {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(null, "The username or password you entered was not recognized!", "Error", JOptionPane.ERROR_MESSAGE);
-
+                    JOptionPane.showMessageDialog(null, "The username or password you entered was not recognized!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    
                 }
             });
         } else if (r == Result.BANNED) {
@@ -44,21 +45,24 @@ public class AuthResultHandler implements PacketHandler<PacketAuthResult> {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(null, "The name you tried to register is already taken!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "The name you tried to register is already taken!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             });
         } else if (r == Result.PASSWORD_SHORT) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(null, "The password you entered is too short!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "The password you entered is too short!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             });
         } else if (r == Result.UNKNOWN) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    JOptionPane.showMessageDialog(null, "An unknown error occurred during authentication!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "An unknown error occurred during authentication!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             });
         } else if (r == Result.OK) {
