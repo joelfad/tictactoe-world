@@ -122,8 +122,32 @@ public class MainFrame extends JFrame {
         JMenu mnGame = new JMenu("Game");
         menuBar.add(mnGame);
         
-        JMenuItem mntmNewGame = new JMenuItem("New Game...");
-        mnGame.add(mntmNewGame);
+        JMenu mnPlayAgainstAi = new JMenu("Play against AI");
+        mnGame.add(mnPlayAgainstAi);
+        
+        JMenuItem mntmRandom = new JMenuItem("Random");
+        mntmRandom.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                MainFrame.this.server.sendPacket(new PacketGlobalChat(":playai random x"));
+            }
+        });
+        mnPlayAgainstAi.add(mntmRandom);
+        
+        JMenuItem mntmBlocking = new JMenuItem("Blocking");
+        mntmBlocking.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                MainFrame.this.server.sendPacket(new PacketGlobalChat(":playai blocking x"));
+            }
+        });
+        mnPlayAgainstAi.add(mntmBlocking);
+        
+        JMenuItem mntmSmart = new JMenuItem("Smart");
+        mntmSmart.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                MainFrame.this.server.sendPacket(new PacketGlobalChat(":playai smart x"));
+            }
+        });
+        mnPlayAgainstAi.add(mntmSmart);
         
         JSeparator separator = new JSeparator();
         mnGame.add(separator);
