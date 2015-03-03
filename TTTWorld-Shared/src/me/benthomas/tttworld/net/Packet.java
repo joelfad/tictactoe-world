@@ -28,6 +28,7 @@ public abstract class Packet {
         
         packetTypes.put(PacketChallenge.PACKET_ID, PacketChallenge.class);
         packetTypes.put(PacketChallengeResponse.PACKET_ID, PacketChallengeResponse.class);
+        packetTypes.put(PacketChallengeCancel.PACKET_ID, PacketChallengeCancel.class);
         
         packetTypes.put(PacketGameUpdate.PACKET_ID, PacketGameUpdate.class);
         packetTypes.put(PacketGameMove.PACKET_ID, PacketGameMove.class);

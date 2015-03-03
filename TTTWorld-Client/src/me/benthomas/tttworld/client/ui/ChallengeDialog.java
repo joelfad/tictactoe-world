@@ -17,14 +17,21 @@ import javax.swing.Box;
 import java.awt.Component;
 
 import me.benthomas.tttworld.net.PacketChallenge;
+import me.benthomas.tttworld.net.PacketChallengeCancel;
 import me.benthomas.tttworld.net.PacketChallengeResponse;
+import me.benthomas.tttworld.net.TTTWConnection.PacketFilter;
+import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 public class ChallengeDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     
     private MainFrame parent;
+    private ChallengeCancelHandler cancelHandler;
+    
     private PacketChallenge packet;
     private long start;
     private Runnable onClose;
@@ -49,13 +56,20 @@ public class ChallengeDialog extends JDialog {
             @Override
             public void windowClosed(WindowEvent e) {
                 ChallengeDialog.this.close();
-                ChallengeDialog.this.parent.getServer().sendPacket(
-                        new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
-                                PacketChallengeResponse.Response.REJECT));
+                
+                if (ChallengeDialog.this.packet != null) {
+                    ChallengeDialog.this.parent.getServer().sendPacket(
+                            new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
+                                    PacketChallengeResponse.Response.REJECT));
+                }
             }
         });
         setAlwaysOnTop(true);
+        
         this.parent = parent;
+        this.cancelHandler = new ChallengeCancelHandler();
+        parent.getServer().addFilteredHandler(PacketChallengeCancel.class, new ChallengeCancelFilter(), this.cancelHandler);
+        
         this.packet = packet;
         this.start = System.currentTimeMillis();
         
@@ -78,6 +92,7 @@ public class ChallengeDialog extends JDialog {
                 ChallengeDialog.this.parent.getServer().sendPacket(
                         new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
                                 PacketChallengeResponse.Response.ACCEPT));
+                ChallengeDialog.this.packet = null;
             }
         });
         panel.add(btnYes);
@@ -86,9 +101,6 @@ public class ChallengeDialog extends JDialog {
         btnNo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ChallengeDialog.this.close();
-                ChallengeDialog.this.parent.getServer().sendPacket(
-                        new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
-                                PacketChallengeResponse.Response.REJECT));
             }
         });
         panel.add(btnNo);
@@ -155,7 +167,23 @@ public class ChallengeDialog extends JDialog {
         if (timeLeft > 0) {
             lblseconds.setText(String.valueOf(timeLeft / 1000));
         } else {
+            this.packet = null;
             this.close();
+        }
+    }
+    
+    public class ChallengeCancelFilter implements PacketFilter<PacketChallengeCancel> {
+        @Override
+        public boolean isFiltered(PacketChallengeCancel packet) {
+            return !packet.getChallengeId().equals(ChallengeDialog.this.packet.getChallengeId());
+        }
+    }
+    
+    public class ChallengeCancelHandler implements PacketHandler<PacketChallengeCancel> {
+        @Override
+        public void handlePacket(PacketChallengeCancel packet) throws IOException {
+            ChallengeDialog.this.packet = null;
+            ChallengeDialog.this.close();
         }
     }
     

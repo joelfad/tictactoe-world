@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -40,7 +41,7 @@ public class TTTWConnection {
     private byte[] cryptKey;
     private SecureRandom cryptRandom = new SecureRandom();
     
-    private HashMap<Class<? extends Packet>, PacketHandler<?>> handlers = new HashMap<Class<? extends Packet>, PacketHandler<?>>();
+    private HashMap<Class<? extends Packet>, FilteredHandler<?>> handlers = new HashMap<Class<? extends Packet>, FilteredHandler<?>>();
     private List<DisconnectListener> disconnectListeners = new ArrayList<DisconnectListener>();
     
     private byte[] packetBuffer;
@@ -54,7 +55,7 @@ public class TTTWConnection {
         this.input = new DataInputStream(socket.getInputStream());
         this.output = new DataOutputStream(socket.getOutputStream());
         
-        this.setHandler(PacketDisconnect.class, new DisconnectHandler());
+        this.setDefaultHandler(PacketDisconnect.class, new DisconnectHandler());
         
         this.lastPacket = System.currentTimeMillis();
     }
@@ -68,15 +69,46 @@ public class TTTWConnection {
     }
     
     @SuppressWarnings("unchecked")
-    public <P extends Packet> PacketHandler<P> getHandler(Class<P> packetType) {
-        return (PacketHandler<P>) this.handlers.get(packetType);
+    public synchronized <P extends Packet> void setDefaultHandler(Class<P> packetType, PacketHandler<P> handler) {
+        if (!this.handlers.containsKey(packetType)) {
+            if (handler != null) {
+                FilteredHandler<P> internalHandler = new FilteredHandler<P>();
+                internalHandler.defaultHandler = handler;
+                
+                this.handlers.put(packetType, internalHandler);
+            }
+        } else {
+            FilteredHandler<P> internalHandler = ((FilteredHandler<P>) this.handlers.get(packetType));
+            internalHandler.defaultHandler = handler;
+            
+            if (internalHandler.handlers.isEmpty() && internalHandler.defaultHandler == null) {
+                this.handlers.remove(packetType);
+            }
+        }
     }
     
-    public synchronized <P extends Packet> void setHandler(Class<P> packetType, PacketHandler<P> handler) {
-        if (handler != null) {
-            this.handlers.put(packetType, handler);
+    @SuppressWarnings("unchecked")
+    public synchronized <P extends Packet> void addFilteredHandler(Class<P> packetType, PacketFilter<? super P> filter,
+            PacketHandler<P> handler) {
+        if (!this.handlers.containsKey(packetType)) {
+            FilteredHandler<P> internalHandler = new FilteredHandler<P>();
+            internalHandler.handlers.put(handler, filter);
+            
+            this.handlers.put(packetType, internalHandler);
         } else {
-            this.handlers.remove(packetType);
+            ((FilteredHandler<P>) this.handlers.get(packetType)).handlers.put(handler, filter);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public synchronized <P extends Packet> void removeFilteredHandler(Class<P> packetType, PacketHandler<P> handler) {
+        if (this.handlers.containsKey(packetType)) {
+            FilteredHandler<P> internalHandler = (FilteredHandler<P>) this.handlers.get(packetType);
+            internalHandler.handlers.remove(handler);
+            
+            if (internalHandler.handlers.isEmpty() && internalHandler.defaultHandler == null) {
+                this.handlers.remove(packetType);
+            }
         }
     }
     
@@ -269,7 +301,7 @@ public class TTTWConnection {
     }
     
     @SuppressWarnings("unchecked")
-    private <P extends Packet> void handlePacket(PacketHandler<P> handler, Packet p) throws IOException {
+    private <P extends Packet> void handlePacket(FilteredHandler<P> handler, Packet p) throws IOException {
         handler.handlePacket((P) p);
     }
     
@@ -339,8 +371,33 @@ public class TTTWConnection {
         public void handlePacket(P packet) throws IOException;
     }
     
+    public interface PacketFilter<P extends Packet> {
+        public boolean isFiltered(P packet);
+    }
+    
     public interface DisconnectListener {
         public void onDisconnect(boolean fromRemote, String reason);
+    }
+    
+    private class FilteredHandler<P extends Packet> {
+        private HashMap<PacketHandler<P>, PacketFilter<? super P>> handlers = new HashMap<PacketHandler<P>, PacketFilter<? super P>>();
+        private PacketHandler<P> defaultHandler;
+        
+        public void handlePacket(P packet) throws IOException {
+            for (Entry<PacketHandler<P>, PacketFilter<? super P>> handler : this.handlers.entrySet()) {
+                if (!handler.getValue().isFiltered(packet)) {
+                    handler.getKey().handlePacket(packet);
+                    return;
+                }
+            }
+            
+            if (defaultHandler != null) {
+                defaultHandler.handlePacket(packet);
+            } else {
+                throw new IOException("Unexpected packet!");
+            }
+        }
+        
     }
     
     private class DisconnectHandler implements PacketHandler<PacketDisconnect> {

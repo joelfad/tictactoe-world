@@ -8,6 +8,8 @@ import me.benthomas.tttworld.net.PacketGameOver;
 import me.benthomas.tttworld.net.PacketGameOver.Result;
 import me.benthomas.tttworld.net.PacketGameUpdate;
 import me.benthomas.tttworld.net.TTTWConnection.DisconnectListener;
+import me.benthomas.tttworld.net.TTTWConnection.PacketFilter;
+import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
 /**
@@ -17,18 +19,27 @@ import me.benthomas.tttworld.server.net.TTTWClientConnection;
  */
 public final class NetPlayer extends Player {
     private TTTWClientConnection client;
+    
+    private GameMoveHandler moveHandler;
     private DisconnectForfeiter forfeit;
     
     public NetPlayer(TTTWClientConnection client, Mark mark) {
         super(client.getAccount().getName(), mark);
         
         this.client = client;
+        
+        this.moveHandler = new GameMoveHandler();
         this.forfeit = new DisconnectForfeiter();
-        this.client.addDisconnectListener(this.forfeit);
     }
     
     public TTTWClientConnection getClient() {
         return this.client;
+    }
+    
+    @Override
+    public void notifyStart() {
+        this.client.addDisconnectListener(this.forfeit);
+        this.client.addFilteredHandler(PacketGameMove.class, new GameMoveFilter(), this.moveHandler);
     }
     
     @Override
@@ -79,6 +90,8 @@ public final class NetPlayer extends Player {
     
     private void notifyOver() {
         this.sendUpdate(false, true);
+        
+        this.client.removeFilteredHandler(PacketGameMove.class, this.moveHandler);
         this.client.removeDisconnectListener(this.forfeit);
     }
     
@@ -90,6 +103,20 @@ public final class NetPlayer extends Player {
                 this.game.getBoard().setMark(p.getX(), p.getY(), this.mark);
                 this.game.tick();
             }
+        }
+    }
+    
+    public class GameMoveFilter implements PacketFilter<PacketGameMove> {
+        @Override
+        public boolean isFiltered(PacketGameMove packet) {
+            return !packet.getGameId().equals(NetPlayer.this.game.getId());
+        }
+    }
+    
+    public class GameMoveHandler implements PacketHandler<PacketGameMove> {
+        @Override
+        public void handlePacket(PacketGameMove packet) throws IOException {
+            NetPlayer.this.handlePacket(packet, NetPlayer.this.game.getActivePlayer() == NetPlayer.this);
         }
     }
     

@@ -24,6 +24,8 @@ public abstract class Player {
         this.mark = mark;
     }
     
+    public abstract void notifyStart();
+    
     /**
      * Causes the player to make a move on their board. A board must be set
      * before a move can be made.

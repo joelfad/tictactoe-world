@@ -25,9 +25,9 @@ public final class HandshakeHandler implements PacketHandler<PacketClientHandsha
             this.client.sendPacket(new PacketServerHandshake(s.getCompressionThreshold(), s.getName(), this.client.getServer()
                     .isRegistrationAllowed(), s.getEncodedPublicKey()));
             
-            this.client.setHandler(PacketClientHandshake.class, null);
-            this.client.setHandler(PacketAuthenticate.class, new AuthenticateHandler(this.client));
-            this.client.setHandler(PacketRegister.class, new RegisterHandler(this.client));
+            this.client.setDefaultHandler(PacketClientHandshake.class, null);
+            this.client.setDefaultHandler(PacketAuthenticate.class, new AuthenticateHandler(this.client));
+            this.client.setDefaultHandler(PacketRegister.class, new RegisterHandler(this.client));
         } else {
             this.client.disconnect("Protocol version mismatch");
         }

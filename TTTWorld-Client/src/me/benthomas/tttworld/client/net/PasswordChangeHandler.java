@@ -26,7 +26,7 @@ public class PasswordChangeHandler implements PacketHandler<PacketPasswordChange
         Result r = packet.getResult();
         
         if (r == Result.OK) {
-            this.server.setHandler(PacketPasswordChangeResult.class, null);
+            this.server.setDefaultHandler(PacketPasswordChangeResult.class, null);
             
             SwingUtilities.invokeLater(new Runnable() {
                 @Override

@@ -20,8 +20,8 @@ public class TTTWServerConnection extends TTTWConnection {
         this.frame = frame;
         this.hostname = hostname;
         
-        this.setHandler(PacketKeepAlive.class, new KeepAliveHandler(this));
-        this.setHandler(PacketServerHandshake.class, new HandshakeHandler(this));
+        this.setDefaultHandler(PacketKeepAlive.class, new KeepAliveHandler(this));
+        this.setDefaultHandler(PacketServerHandshake.class, new HandshakeHandler(this));
     }
     
     public MainFrame getFrame() {

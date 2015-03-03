@@ -19,7 +19,7 @@ public class GameUpdateHandler implements PacketHandler<PacketGameUpdate> {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                GameUpdateHandler.this.server.getFrame().handleGameUpdate(packet);
+                GameUpdateHandler.this.server.getFrame().createNewGame(packet);
             }
         });
     }

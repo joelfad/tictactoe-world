@@ -30,6 +30,9 @@ public class Game {
         xPlayer.setGame(this);
         oPlayer.setGame(this);
         
+        xPlayer.notifyStart();
+        oPlayer.notifyStart();
+        
         this.xPlayer = xPlayer;
         this.oPlayer = oPlayer;
     }

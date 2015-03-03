@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import me.benthomas.tttworld.net.PacketAuthResult;
 import me.benthomas.tttworld.net.PacketAuthenticate;
-import me.benthomas.tttworld.net.PacketChallengeResponse;
-import me.benthomas.tttworld.net.PacketGameMove;
 import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.net.PacketPasswordChange;
 import me.benthomas.tttworld.net.PacketRegister;
@@ -17,15 +15,11 @@ public class AuthenticateHandler implements PacketHandler<PacketAuthenticate> {
     private TTTWClientConnection client;
     
     public static void onAuthenticated(TTTWClientConnection client) throws IOException {
-        client.setHandler(PacketAuthenticate.class, null);
-        client.setHandler(PacketRegister.class, null);
+        client.setDefaultHandler(PacketAuthenticate.class, null);
+        client.setDefaultHandler(PacketRegister.class, null);
         
-        client.setHandler(PacketPasswordChange.class, new PasswordChangeHandler(client));
-        client.setHandler(PacketGlobalChat.class, new GlobalChatHandler(client));
-        
-        client.setHandler(PacketChallengeResponse.class, new ChallengeResponseHandler(client));
-        
-        client.setHandler(PacketGameMove.class, new GameMoveHandler(client));
+        client.setDefaultHandler(PacketPasswordChange.class, new PasswordChangeHandler(client));
+        client.setDefaultHandler(PacketGlobalChat.class, new GlobalChatHandler(client));
         
         client.sendPacket(new PacketGlobalChat("Welcome to Tic-Tac-Toe World!"));
         client.getServer().sendGlobalBroadcast(client.getAccount().getName() + " has connected!");

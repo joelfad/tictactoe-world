@@ -37,7 +37,6 @@ import me.benthomas.tttworld.client.net.TTTWServerConnection;
 import me.benthomas.tttworld.net.PacketAuthenticate;
 import me.benthomas.tttworld.net.PacketChallenge;
 import me.benthomas.tttworld.net.PacketClientHandshake;
-import me.benthomas.tttworld.net.PacketGameOver;
 import me.benthomas.tttworld.net.PacketGameUpdate;
 import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.net.PacketGlobalPlayerList.PlayerInfo;
@@ -159,7 +158,7 @@ public class MainFrame extends JFrame {
                 MainFrame.this.dialog = d = new CreatePasswordDialog("Change Password", MainFrame.this.username, new Runnable() {
                     @Override
                     public void run() {
-                        MainFrame.this.server.setHandler(PacketPasswordChangeResult.class, new PasswordChangeHandler(
+                        MainFrame.this.server.setDefaultHandler(PacketPasswordChangeResult.class, new PasswordChangeHandler(
                                 MainFrame.this.server, d, false));
                         MainFrame.this.server.sendPacket(new PacketPasswordChange(null, new String(d.getPasswordField()
                                 .getPassword())));
@@ -202,7 +201,7 @@ public class MainFrame extends JFrame {
                 MainFrame.this.dialog = d = new CreatePasswordDialog("Reset Password", null, new Runnable() {
                     @Override
                     public void run() {
-                        MainFrame.this.server.setHandler(PacketPasswordChangeResult.class, new PasswordChangeHandler(
+                        MainFrame.this.server.setDefaultHandler(PacketPasswordChangeResult.class, new PasswordChangeHandler(
                                 MainFrame.this.server, d, true));
                         MainFrame.this.server.sendPacket(new PacketPasswordChange(d.getUsernameField().getText(), new String(d
                                 .getPasswordField().getPassword())));
@@ -535,28 +534,18 @@ public class MainFrame extends JFrame {
         d.setVisible(true);
     }
     
-    public void handleGameUpdate(PacketGameUpdate p) {
-        if (this.games.containsKey(p.getGameId())) {
-            this.games.get(p.getGameId()).handlePacket(p);
-        } else {
-            GameFrame f = new GameFrame(this, p);
-            f.setVisible(true);
-            
-            f.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    MainFrame.this.games.remove(p.getGameId());
-                }
-            });
-            
-            this.games.put(p.getGameId(), f);
-        }
-    }
-    
-    public void handleGameOver(PacketGameOver p) {
-        if (this.games.containsKey(p.getGameId())) {
-            this.games.get(p.getGameId()).handlePacket(p);
-        }
+    public void createNewGame(PacketGameUpdate p) {
+        GameFrame f = new GameFrame(this, p);
+        f.setVisible(true);
+        
+        f.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                MainFrame.this.games.remove(p.getGameId());
+            }
+        });
+        
+        this.games.put(p.getGameId(), f);
     }
     
     private class DisconnectNotifier implements DisconnectListener {

@@ -30,7 +30,7 @@ public class HandshakeHandler implements PacketHandler<PacketServerHandshake> {
     
     @Override
     public void handlePacket(PacketServerHandshake packet) throws IOException {
-        this.server.setHandler(PacketServerHandshake.class, null);
+        this.server.setDefaultHandler(PacketServerHandshake.class, null);
         this.server.getFrame().setRegistrationAllowed(packet.isRegistrationAllowed());
         
         SwingUtilities.invokeLater(new Runnable() {
@@ -56,7 +56,7 @@ public class HandshakeHandler implements PacketHandler<PacketServerHandshake> {
                                 JOptionPane.WARNING_MESSAGE);
                     }
                     
-                    HandshakeHandler.this.server.setHandler(PacketAuthResult.class, new AuthResultHandler(
+                    HandshakeHandler.this.server.setDefaultHandler(PacketAuthResult.class, new AuthResultHandler(
                             HandshakeHandler.this.server));
                     HandshakeHandler.this.server.getFrame().displayLoginDialog();
                 } else {

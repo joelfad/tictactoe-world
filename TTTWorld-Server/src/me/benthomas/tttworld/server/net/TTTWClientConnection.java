@@ -22,8 +22,8 @@ public class TTTWClientConnection extends TTTWConnection {
         
         this.server = server;
         
-        this.setHandler(PacketClientHandshake.class, new HandshakeHandler(this));
-        this.setHandler(PacketStartEncrypt.class, new StartEncryptHandler(this));
+        this.setDefaultHandler(PacketClientHandshake.class, new HandshakeHandler(this));
+        this.setDefaultHandler(PacketStartEncrypt.class, new StartEncryptHandler(this));
         
         this.addDisconnectListener(new DisconnectLogger());
     }

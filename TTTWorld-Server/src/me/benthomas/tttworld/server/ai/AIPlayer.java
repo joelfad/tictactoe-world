@@ -27,6 +27,10 @@ public abstract class AIPlayer extends Player {
     }
     
     @Override
+    public void notifyStart() {
+    }
+
+    @Override
     public final void notifyUpdate(boolean myTurn) {
         if (myTurn) {
             for (AIBehaviour behaviour : this.behaviours) {

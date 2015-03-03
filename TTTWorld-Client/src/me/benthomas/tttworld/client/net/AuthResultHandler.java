@@ -8,10 +8,10 @@ import javax.swing.SwingUtilities;
 import me.benthomas.tttworld.net.PacketAuthResult;
 import me.benthomas.tttworld.net.PacketAuthResult.Result;
 import me.benthomas.tttworld.net.PacketChallenge;
-import me.benthomas.tttworld.net.PacketGameOver;
 import me.benthomas.tttworld.net.PacketGameUpdate;
 import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.net.PacketGlobalPlayerList;
+import me.benthomas.tttworld.net.TTTWConnection.PacketFilter;
 import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 
 public class AuthResultHandler implements PacketHandler<PacketAuthResult> {
@@ -69,12 +69,13 @@ public class AuthResultHandler implements PacketHandler<PacketAuthResult> {
             this.server.getFrame().setAdmin(packet.isAdmin());
             this.server.getFrame().setUsername(packet.getUsername());
             
-            this.server.setHandler(PacketAuthResult.class, new PostAuthResultHandler(this.server));
-            this.server.setHandler(PacketGlobalChat.class, new GlobalChatHandler(this.server));
-            this.server.setHandler(PacketGlobalPlayerList.class, new GlobalPlayerListHandler(this.server));
-            this.server.setHandler(PacketChallenge.class, new ChallengeHandler(this.server));
-            this.server.setHandler(PacketGameUpdate.class, new GameUpdateHandler(this.server));
-            this.server.setHandler(PacketGameOver.class, new GameOverHandler(this.server));
+            this.server.addFilteredHandler(PacketAuthResult.class, new PostAuthResultFilter(), new PostAuthResultHandler(this.server));
+            this.server.setDefaultHandler(PacketAuthResult.class, null);
+            
+            this.server.setDefaultHandler(PacketGlobalChat.class, new GlobalChatHandler(this.server));
+            this.server.setDefaultHandler(PacketGlobalPlayerList.class, new GlobalPlayerListHandler(this.server));
+            this.server.setDefaultHandler(PacketChallenge.class, new ChallengeHandler(this.server));
+            this.server.setDefaultHandler(PacketGameUpdate.class, new GameUpdateHandler(this.server));
             
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -83,6 +84,13 @@ public class AuthResultHandler implements PacketHandler<PacketAuthResult> {
                     AuthResultHandler.this.server.getFrame().displayMainFrame();
                 }
             });
+        }
+    }
+    
+    public static class PostAuthResultFilter implements PacketFilter<PacketAuthResult> {
+        @Override
+        public boolean isFiltered(PacketAuthResult packet) {
+            return packet.getResult() != Result.OK;
         }
     }
     
@@ -95,12 +103,8 @@ public class AuthResultHandler implements PacketHandler<PacketAuthResult> {
         
         @Override
         public void handlePacket(PacketAuthResult packet) throws IOException {
-            if (packet.getResult() == Result.OK) {
-                this.server.getFrame().setUsername(packet.getUsername());
-                this.server.getFrame().setAdmin(packet.isAdmin());
-            } else {
-                throw new IOException("Unexpected packet!");
-            }
+            this.server.getFrame().setUsername(packet.getUsername());
+            this.server.getFrame().setAdmin(packet.isAdmin());
         }
         
     }

@@ -8,6 +8,12 @@ import java.util.UUID;
 
 import me.benthomas.tttworld.Mark;
 import me.benthomas.tttworld.net.PacketChallenge;
+import me.benthomas.tttworld.net.PacketChallengeCancel;
+import me.benthomas.tttworld.net.PacketChallengeResponse;
+import me.benthomas.tttworld.net.PacketChallengeResponse.Response;
+import me.benthomas.tttworld.net.TTTWConnection.DisconnectListener;
+import me.benthomas.tttworld.net.TTTWConnection.PacketFilter;
+import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
 public class GameManager {
@@ -45,21 +51,22 @@ public class GameManager {
         return false;
     }
     
-    public synchronized void rejectChallenge(UUID challengeId, TTTWClientConnection receiver) {
+    public synchronized void rejectChallenge(UUID challengeId) {
         Challenge c = this.challenges.get(challengeId);
         
-        if (c != null && c.receiver == receiver) {
+        if (c != null) {
             this.challenges.remove(challengeId);
         }
     }
     
-    public synchronized Game acceptChallenge(UUID challengeId, TTTWClientConnection receiver) {
+    public synchronized Game acceptChallenge(UUID challengeId) {
         Challenge c = this.challenges.get(challengeId);
         
-        if (c != null && c.receiver == receiver) {
+        if (c != null) {
+            c.stop(false);
             this.challenges.remove(challengeId);
             
-            return this.createGame(challengeId, new NetPlayer(receiver, Mark.X), new NetPlayer(c.sender, Mark.O));
+            return this.createGame(challengeId, new NetPlayer(c.receiver, Mark.X), new NetPlayer(c.sender, Mark.O));
         } else {
             return null;
         }
@@ -85,6 +92,7 @@ public class GameManager {
             Challenge c = challengeIterator.next().getValue();
             
             if (System.currentTimeMillis() > c.expires || !c.sender.isAlive() || !c.receiver.isAlive()) {
+                c.stop(true);
                 challengeIterator.remove();
             }
         }
@@ -107,12 +115,69 @@ public class GameManager {
         public final TTTWClientConnection sender;
         public final TTTWClientConnection receiver;
         
+        private boolean stopped = false;
+        private ChallengeDisconnectListener disconnectListener;
+        private ChallengeResponseHandler responseHandler;
+        
         public Challenge(UUID id, long expires, TTTWClientConnection sender, TTTWClientConnection receiver) {
             this.id = id;
             this.expires = expires;
             
             this.sender = sender;
             this.receiver = receiver;
+            
+            this.disconnectListener = new ChallengeDisconnectListener();
+            this.responseHandler = new ChallengeResponseHandler();
+            
+            this.sender.addDisconnectListener(this.disconnectListener);
+            this.receiver.addDisconnectListener(this.disconnectListener);
+            
+            this.receiver.addFilteredHandler(PacketChallengeResponse.class, new ChallengeResponseFilter(), this.responseHandler);
+        }
+        
+        private synchronized void stop(boolean cancel) {
+            if (!this.stopped) {
+                this.stopped = true;
+                
+                this.sender.removeDisconnectListener(this.disconnectListener);
+                this.receiver.removeDisconnectListener(this.disconnectListener);
+                
+                this.receiver.removeFilteredHandler(PacketChallengeResponse.class, this.responseHandler);
+                
+                if (cancel) {
+                    try {
+                        this.receiver.sendPacket(new PacketChallengeCancel(Challenge.this.id));
+                    } catch (IOException e) {
+                        // There's not much we can do about this...
+                    }
+                }
+            }
+        }
+        
+        private class ChallengeDisconnectListener implements DisconnectListener {
+            @Override
+            public void onDisconnect(boolean fromRemote, String reason) {
+                Challenge.this.stop(true);
+                GameManager.this.rejectChallenge(Challenge.this.id);
+            }
+        }
+        
+        private class ChallengeResponseFilter implements PacketFilter<PacketChallengeResponse> {
+            @Override
+            public boolean isFiltered(PacketChallengeResponse packet) {
+                return !packet.getChallengeId().equals(Challenge.this.id);
+            }
+        }
+        
+        private class ChallengeResponseHandler implements PacketHandler<PacketChallengeResponse> {
+            @Override
+            public void handlePacket(PacketChallengeResponse packet) {
+                if (packet.getResponse() == Response.ACCEPT) {
+                    GameManager.this.acceptChallenge(Challenge.this.id);
+                } else {
+                    GameManager.this.rejectChallenge(Challenge.this.id);
+                }
+            }
         }
     }
     
