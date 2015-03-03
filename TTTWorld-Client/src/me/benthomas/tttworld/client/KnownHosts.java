@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -79,7 +78,7 @@ public class KnownHosts {
             
             for (Entry<Object, Object> host : p.entrySet()) {
                 try {
-                    KnownHosts.hosts.put(host.getKey().toString(), Base64.getDecoder().decode(host.getValue().toString()));
+                    KnownHosts.hosts.put(host.getKey().toString(), Crypto.decodeFromBase64(host.getValue().toString()));
                 } catch (IllegalArgumentException e) {
                     // Ignore invalid entries
                 }
@@ -116,7 +115,7 @@ public class KnownHosts {
         Properties p = new Properties();
         
         for (Entry<String, byte[]> e : KnownHosts.hosts.entrySet()) {
-            p.put(e.getKey(), Base64.getEncoder().encodeToString(e.getValue()));
+            p.put(e.getKey(), Crypto.encodeToBase64(e.getValue()));
         }
         
         try (FileOutputStream out = new FileOutputStream("hosts.txt")) {

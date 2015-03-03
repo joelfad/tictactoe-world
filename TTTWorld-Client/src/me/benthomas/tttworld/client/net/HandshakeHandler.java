@@ -29,7 +29,7 @@ public class HandshakeHandler implements PacketHandler<PacketServerHandshake> {
     }
     
     @Override
-    public void handlePacket(PacketServerHandshake packet) throws IOException {
+    public void handlePacket(final PacketServerHandshake packet) throws IOException {
         this.server.setDefaultHandler(PacketServerHandshake.class, null);
         this.server.getFrame().setRegistrationAllowed(packet.isRegistrationAllowed());
         

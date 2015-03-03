@@ -29,7 +29,7 @@ public class CreatePasswordDialog extends JDialog {
     private JLabel lblConfirmPassword;
     private JPasswordField confirmPasswordField;
     
-    public CreatePasswordDialog(String title, String username, Runnable onOk) {
+    public CreatePasswordDialog(String title, String username, final Runnable onOk) {
         setAlwaysOnTop(true);
         setResizable(false);
         setTitle(title);

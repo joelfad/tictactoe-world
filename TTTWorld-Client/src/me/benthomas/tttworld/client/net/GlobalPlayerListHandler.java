@@ -18,7 +18,7 @@ public class GlobalPlayerListHandler implements PacketHandler<PacketGlobalPlayer
     }
     
     @Override
-    public void handlePacket(PacketGlobalPlayerList packet) throws IOException {
+    public void handlePacket(final PacketGlobalPlayerList packet) throws IOException {
         Collections.sort(packet.getPlayers());
         
         SwingUtilities.invokeLater(new Runnable() {

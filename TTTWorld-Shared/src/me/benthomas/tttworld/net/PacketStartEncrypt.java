@@ -1,6 +1,6 @@
 package me.benthomas.tttworld.net;
 
-import java.util.Base64;
+import me.benthomas.tttworld.Crypto;
 
 import org.json.JSONObject;
 
@@ -27,7 +27,7 @@ public class PacketStartEncrypt extends Packet {
     public JSONObject write() {
         JSONObject o = super.write();
         
-        o.put("crypt_key", Base64.getEncoder().encodeToString(this.cryptKey));
+        o.put("crypt_key", Crypto.encodeToBase64(this.cryptKey));
         
         return o;
     }
@@ -36,7 +36,7 @@ public class PacketStartEncrypt extends Packet {
     public void read(JSONObject o) {
         super.read(o);
         
-        this.cryptKey = Base64.getDecoder().decode(o.getString("crypt_key"));
+        this.cryptKey = Crypto.decodeFromBase64(o.getString("crypt_key"));
     }
     
 }

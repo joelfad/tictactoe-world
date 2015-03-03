@@ -15,7 +15,7 @@ public class ChallengeHandler implements PacketHandler<PacketChallenge> {
     }
     
     @Override
-    public void handlePacket(PacketChallenge packet) throws IOException {
+    public void handlePacket(final PacketChallenge packet) throws IOException {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

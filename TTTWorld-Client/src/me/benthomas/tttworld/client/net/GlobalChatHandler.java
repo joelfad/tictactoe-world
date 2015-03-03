@@ -15,7 +15,7 @@ public class GlobalChatHandler implements PacketHandler<PacketGlobalChat> {
     }
     
     @Override
-    public void handlePacket(PacketGlobalChat packet) throws IOException {
+    public void handlePacket(final PacketGlobalChat packet) throws IOException {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

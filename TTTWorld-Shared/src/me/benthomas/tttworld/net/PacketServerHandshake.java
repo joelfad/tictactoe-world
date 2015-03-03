@@ -1,6 +1,6 @@
 package me.benthomas.tttworld.net;
 
-import java.util.Base64;
+import me.benthomas.tttworld.Crypto;
 
 import org.json.JSONObject;
 
@@ -50,7 +50,7 @@ public class PacketServerHandshake extends Packet {
         if (this.publicKey == null) {
             o.put("public_key", "");
         } else {
-            o.put("public_key", Base64.getEncoder().encodeToString(this.publicKey));
+            o.put("public_key", Crypto.encodeToBase64(this.publicKey));
         }
         
         return o;
@@ -63,6 +63,6 @@ public class PacketServerHandshake extends Packet {
         this.compressThreshold = o.getInt("compress_threshold");
         this.serverName = o.getString("server_name");
         this.registerAllowed = o.getBoolean("register_allowed");
-        this.publicKey = Base64.getDecoder().decode(o.getString("public_key"));
+        this.publicKey = Crypto.decodeFromBase64(o.getString("public_key"));
     }
 }

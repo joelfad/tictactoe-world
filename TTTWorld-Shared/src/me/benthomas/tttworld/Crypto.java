@@ -15,6 +15,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
 public class Crypto {
     
@@ -92,6 +93,14 @@ public class Crypto {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    public static String encodeToBase64(byte[] b) {
+        return DatatypeConverter.printBase64Binary(b);
+    }
+    
+    public static byte[] decodeFromBase64(String s) {
+        return DatatypeConverter.parseBase64Binary(s);
     }
     
     private Crypto() {

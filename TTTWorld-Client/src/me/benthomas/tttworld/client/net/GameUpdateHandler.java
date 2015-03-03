@@ -15,7 +15,7 @@ public class GameUpdateHandler implements PacketHandler<PacketGameUpdate> {
     }
     
     @Override
-    public void handlePacket(PacketGameUpdate packet) throws IOException {
+    public void handlePacket(final PacketGameUpdate packet) throws IOException {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

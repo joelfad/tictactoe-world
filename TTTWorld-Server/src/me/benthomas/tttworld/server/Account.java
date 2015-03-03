@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +54,7 @@ public class Account {
         String[] dataParts = data.split("\\$");
         
         this.passwordSalt = dataParts[0];
-        this.passwordHash = Base64.getDecoder().decode(dataParts[1]);
+        this.passwordHash = Crypto.decodeFromBase64(dataParts[1]);
         
         this.meta = new HashMap<String, String>();
         
@@ -182,7 +181,7 @@ public class Account {
         StringBuilder b = new StringBuilder(this.passwordSalt);
         
         b.append("$");
-        b.append(Base64.getEncoder().encodeToString(this.passwordHash));
+        b.append(Crypto.encodeToBase64(this.passwordHash));
         
         for (Entry<String, String> meta : this.meta.entrySet()) {
             b.append("$");

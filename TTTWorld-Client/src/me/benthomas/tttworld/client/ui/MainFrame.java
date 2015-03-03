@@ -523,7 +523,7 @@ public class MainFrame extends JFrame {
     }
     
     public void displayChallengeDialog(PacketChallenge p) {
-        ChallengeDialog d = new ChallengeDialog(this, p);
+        final ChallengeDialog d = new ChallengeDialog(this, p);
         d.setOnClose(new Runnable() {
             @Override
             public void run() {
@@ -535,7 +535,7 @@ public class MainFrame extends JFrame {
         this.challenges.add(d);
     }
     
-    public void createNewGame(PacketGameUpdate p) {
+    public void createNewGame(final PacketGameUpdate p) {
         GameFrame f = new GameFrame(this, p);
         f.setVisible(true);
         
@@ -551,7 +551,7 @@ public class MainFrame extends JFrame {
     
     private class DisconnectNotifier implements DisconnectListener {
         @Override
-        public void onDisconnect(boolean fromRemote, String reason) {
+        public void onDisconnect(boolean fromRemote, final String reason) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
