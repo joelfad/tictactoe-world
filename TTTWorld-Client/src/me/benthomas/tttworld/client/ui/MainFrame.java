@@ -68,7 +68,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JScrollPane;
-import javax.swing.JRadioButtonMenuItem;
 
 public class MainFrame extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -126,15 +125,6 @@ public class MainFrame extends JFrame {
         JMenuItem mntmNewGame = new JMenuItem("New Game...");
         mnGame.add(mntmNewGame);
         
-        JMenuItem mntmJoinGame = new JMenuItem("Join Game...");
-        mnGame.add(mntmJoinGame);
-        
-        JMenuItem mntmFindGame = new JMenuItem("Find Game...");
-        mnGame.add(mntmFindGame);
-        
-        JMenuItem mntmSpectateGame = new JMenuItem("Spectate Game...");
-        mnGame.add(mntmSpectateGame);
-        
         JSeparator separator = new JSeparator();
         mnGame.add(separator);
         
@@ -168,25 +158,6 @@ public class MainFrame extends JFrame {
                 d.setVisible(true);
             }
         });
-        
-        JMenu mnReceiveChallengesFrom = new JMenu("Receive Challenges From");
-        mnAccount.add(mnReceiveChallengesFrom);
-        
-        JRadioButtonMenuItem rdbtnmntmEverybody = new JRadioButtonMenuItem("Everybody");
-        rdbtnmntmEverybody.setSelected(true);
-        mnReceiveChallengesFrom.add(rdbtnmntmEverybody);
-        
-        JRadioButtonMenuItem rdbtnmntmFriends = new JRadioButtonMenuItem("Friends");
-        mnReceiveChallengesFrom.add(rdbtnmntmFriends);
-        
-        JRadioButtonMenuItem rdbtnmntmNobody = new JRadioButtonMenuItem("Nobody");
-        mnReceiveChallengesFrom.add(rdbtnmntmNobody);
-        
-        JMenuItem mntmFriendList = new JMenuItem("Friend List...");
-        mnAccount.add(mntmFriendList);
-        
-        JSeparator separator_2 = new JSeparator();
-        mnAccount.add(separator_2);
         mnAccount.add(mntmChangePassword);
         
         mnAdmin = new JMenu("Admin");
