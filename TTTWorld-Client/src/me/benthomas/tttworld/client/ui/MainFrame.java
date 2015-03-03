@@ -13,7 +13,6 @@ import java.awt.Dimension;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -111,7 +110,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setBounds(100, 100, 600, 500);
         
-        addWindowListener(new PartialWindowListener() {
+        addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 MainFrame.this.disconnect();
@@ -487,7 +486,7 @@ public class MainFrame extends JFrame {
         if (this.serverSelect == null) {
             this.serverSelect = new ServerSelectDialog(this);
             
-            this.serverSelect.addWindowListener(new PartialWindowListener() {
+            this.serverSelect.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     System.exit(0);
@@ -502,7 +501,7 @@ public class MainFrame extends JFrame {
         if (this.login == null) {
             this.login = new LoginDialog(this);
             
-            this.login.addWindowListener(new PartialWindowListener() {
+            this.login.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     MainFrame.this.disconnect();
@@ -568,36 +567,6 @@ public class MainFrame extends JFrame {
         @Override
         public boolean equals(Object o) {
             return (o instanceof DisconnectNotifier);
-        }
-    }
-    
-    public interface PartialWindowListener extends WindowListener {
-        @Override
-        public default void windowActivated(WindowEvent e) {
-        }
-        
-        @Override
-        public default void windowClosed(WindowEvent e) {
-        }
-        
-        @Override
-        public default void windowClosing(WindowEvent e) {
-        }
-        
-        @Override
-        public default void windowDeactivated(WindowEvent e) {
-        }
-        
-        @Override
-        public default void windowDeiconified(WindowEvent e) {
-        }
-        
-        @Override
-        public default void windowIconified(WindowEvent e) {
-        }
-        
-        @Override
-        public default void windowOpened(WindowEvent e) {
         }
     }
     
