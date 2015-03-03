@@ -14,7 +14,7 @@ public class Game {
     private UUID id;
     private Board board;
     
-    private boolean turn = false;
+    private boolean turn = true;
     private boolean done = false;
     
     private Player xPlayer;

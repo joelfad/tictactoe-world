@@ -21,6 +21,7 @@ public class CommandExecutor {
         CommandExecutor.registerCommand(new CommandDemote());
         CommandExecutor.registerCommand(new CommandStop());
         CommandExecutor.registerCommand(new CommandChallenge());
+        CommandExecutor.registerCommand(new CommandPlayAI());
     }
     
     public static String getCommand(String[] args) {

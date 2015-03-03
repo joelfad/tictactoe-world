@@ -72,8 +72,18 @@ public class GameManager {
         }
     }
     
-    public synchronized Game createGame(UUID gameId, Player xPlayer, Player oPlayer) {
-        Game g = new Game(gameId, xPlayer, oPlayer);
+    public synchronized Game createGame(UUID gameId, Player player1, Player player2) {
+        Game g;
+        
+        if (player1.getMark() == Mark.X && player2.getMark() == Mark.O) { 
+            g = new Game(gameId, player1, player2);
+        } else if (player1.getMark() == Mark.O && player2.getMark() == Mark.X) {
+            g = new Game(gameId, player2, player1);
+        } else {
+            throw new IllegalArgumentException("Two players playing with the same mark?");
+        }
+        
+        
         this.games.put(gameId, g);
         
         g.tick();
