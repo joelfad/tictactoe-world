@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import me.benthomas.tttworld.net.PacketClientHandshake;
+import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.net.PacketStartEncrypt;
 import me.benthomas.tttworld.net.TTTWConnection;
 import me.benthomas.tttworld.server.Account;
@@ -61,6 +62,21 @@ public class TTTWClientConnection extends TTTWConnection {
         this.account = account;
     }
     
+    public void sendMessage(String message) {
+        try {
+            this.sendPacket(new PacketGlobalChat(message));
+        } catch (IOException e) {
+            this.disconnect("Error sending packet!");
+        }
+    }
+    
+    @Override
+    public void disconnect(String message) {
+        if (!this.disconnecting) {
+            super.disconnect(message);
+        }
+    }
+
     public class DisconnectLogger implements DisconnectListener {
         
         @Override

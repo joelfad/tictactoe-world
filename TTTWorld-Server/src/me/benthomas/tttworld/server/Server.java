@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import me.benthomas.tttworld.Crypto;
-import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.net.PacketGlobalPlayerList;
 import me.benthomas.tttworld.net.PacketGlobalPlayerList.PlayerInfo;
 import me.benthomas.tttworld.net.PacketKeepAlive;
@@ -204,11 +203,7 @@ public class Server {
         synchronized (this.connectedPlayers) {
             for (TTTWClientConnection player : this.connectedPlayers) {
                 if (player.getAccount() != null) {
-                    try {
-                        player.sendPacket(new PacketGlobalChat(message));
-                    } catch (IOException e) {
-                        // Ignore failures while sending broadcast messages
-                    }
+                    player.sendMessage(message);
                 }
             }
         }

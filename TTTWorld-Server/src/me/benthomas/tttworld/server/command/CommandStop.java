@@ -2,7 +2,6 @@ package me.benthomas.tttworld.server.command;
 
 import java.io.IOException;
 
-import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
 public class CommandStop implements Command {
@@ -18,7 +17,7 @@ public class CommandStop implements Command {
             client.getServer().sendGlobalBroadcast("<" + client.getAccount().getName() + "> I just did something silly!");
             return;
         } else if (args.length != 1) {
-            client.sendPacket(new PacketGlobalChat("Correct syntax is :stop"));
+            client.sendMessage("Correct syntax is :stop");
             return;
         }
         

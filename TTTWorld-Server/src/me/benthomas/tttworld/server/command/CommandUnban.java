@@ -2,7 +2,6 @@ package me.benthomas.tttworld.server.command;
 
 import java.io.IOException;
 
-import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.server.Account;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
@@ -19,7 +18,7 @@ public class CommandUnban implements Command {
             client.getServer().sendGlobalBroadcast("<" + client.getAccount().getName() + "> I just did something silly!");
             return;
         } else if (args.length != 2) {
-            client.sendPacket(new PacketGlobalChat("Correct syntax is :unban <player>"));
+            client.sendMessage("Correct syntax is :unban <player>");
             return;
         }
         
@@ -28,12 +27,12 @@ public class CommandUnban implements Command {
         if (toUnban != null) {
             if (toUnban.isBanned()) {
                 toUnban.setBanned(false);
-                client.sendPacket(new PacketGlobalChat("Successfully unbanned " + toUnban.getName()));
+                client.sendMessage("Successfully unbanned " + toUnban.getName());
             } else {
-                client.sendPacket(new PacketGlobalChat(toUnban.getName() + " is not banned!"));
+                client.sendMessage(toUnban.getName() + " is not banned!");
             }
         } else {
-            client.sendPacket(new PacketGlobalChat("Could not find player " + args[1]));
+            client.sendMessage("Could not find player " + args[1]);
         }
     }
     

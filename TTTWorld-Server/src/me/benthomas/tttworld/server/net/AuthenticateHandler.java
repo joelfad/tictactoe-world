@@ -21,7 +21,7 @@ public class AuthenticateHandler implements PacketHandler<PacketAuthenticate> {
         client.setDefaultHandler(PacketPasswordChange.class, new PasswordChangeHandler(client));
         client.setDefaultHandler(PacketGlobalChat.class, new GlobalChatHandler(client));
         
-        client.sendPacket(new PacketGlobalChat("Welcome to Tic-Tac-Toe World!"));
+        client.sendMessage("Welcome to Tic-Tac-Toe World!");
         client.getServer().sendGlobalBroadcast(client.getAccount().getName() + " has connected!");
         client.getServer().sendPlayerList();
     }

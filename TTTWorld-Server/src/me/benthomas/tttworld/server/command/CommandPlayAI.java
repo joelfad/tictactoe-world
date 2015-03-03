@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import me.benthomas.tttworld.Mark;
-import me.benthomas.tttworld.net.PacketGlobalChat;
 import me.benthomas.tttworld.server.NetPlayer;
 import me.benthomas.tttworld.server.ai.AIPlayerBlocking;
 import me.benthomas.tttworld.server.ai.AIPlayerRandom;
@@ -13,8 +12,8 @@ import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
 public class CommandPlayAI implements Command {
     
-    private void sendSyntax(TTTWClientConnection client) throws IOException {
-        client.sendPacket(new PacketGlobalChat("Correct syntax is :playai {random|blocking|smart} {x|o}"));
+    private void sendSyntax(TTTWClientConnection client) {
+        client.sendMessage("Correct syntax is :playai {random|blocking|smart} {x|o}");
     }
     
     @Override
