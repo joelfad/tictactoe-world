@@ -429,8 +429,8 @@ public class MainFrame extends JFrame {
             this.dialog = null;
         }
         
-        for (ChallengeDialog challenge : this.challenges) {
-            challenge.close();
+        while (this.challenges.size() > 0) {
+            this.challenges.get(0).close();
         }
         
         this.challenges.clear();
@@ -532,6 +532,8 @@ public class MainFrame extends JFrame {
             }
         });
         d.setVisible(true);
+        
+        this.challenges.add(d);
     }
     
     public void createNewGame(PacketGameUpdate p) {

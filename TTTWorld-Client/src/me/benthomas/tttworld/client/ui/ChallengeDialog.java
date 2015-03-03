@@ -57,7 +57,7 @@ public class ChallengeDialog extends JDialog {
             public void windowClosed(WindowEvent e) {
                 ChallengeDialog.this.close();
                 
-                if (ChallengeDialog.this.packet != null) {
+                if (ChallengeDialog.this.packet != null && ChallengeDialog.this.parent.getServer() != null) {
                     ChallengeDialog.this.parent.getServer().sendPacket(
                             new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
                                     PacketChallengeResponse.Response.REJECT));
