@@ -27,7 +27,10 @@ public final class HandshakeHandler implements PacketHandler<PacketClientHandsha
             
             this.client.setDefaultHandler(PacketClientHandshake.class, null);
             this.client.setDefaultHandler(PacketAuthenticate.class, new AuthenticateHandler(this.client));
-            this.client.setDefaultHandler(PacketRegister.class, new RegisterHandler(this.client));
+            
+            if (this.client.getServer().isRegistrationAllowed()) {
+                this.client.setDefaultHandler(PacketRegister.class, new RegisterHandler(this.client));
+            }
         } else {
             this.client.disconnect("Protocol version mismatch");
         }
