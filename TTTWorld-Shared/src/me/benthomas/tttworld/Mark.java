@@ -38,6 +38,13 @@ public enum Mark {
         this.isPlayer = isPlayer;
     }
     
+    /**
+     * Gets the mark associated with a specific character.
+     * 
+     * @param c The character to get the mark for.
+     * @return The mark associated with the given character, or {@code null} if
+     *         no mark is associated with that character.
+     */
     public static Mark getByChar(char c) {
         for (Mark m : Mark.values()) {
             if (m.markCharacter == c) {

@@ -7,8 +7,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,18 +16,46 @@ import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-
 import me.benthomas.tttworld.Crypto;
+import me.benthomas.tttworld.Crypto.CryptoException;
 
+/**
+ * Represents a connection to a TTTW-compliant endpoint. This connection
+ * supports sending and receiving any subclasses of {@link Packet} and supports
+ * event-driven handling of these packets. This class should be subclassed if
+ * further state information is required.
+ *
+ * @author Ben Thomas
+ */
 public class TTTWConnection {
+    /**
+     * The current TTTW protocol major version.
+     */
     public static final int PROTOCOL_MAJOR_VERSION = 2;
+    
+    /**
+     * The current TTTW protocol minor version.
+     */
     public static final int PROTOCOL_MINOR_VERSION = 1;
     
+    /**
+     * The maximum time (in milliseconds) that a timestamp on a packet is
+     * permitted to deviate from current system time as returned by
+     * {@link System#currentTimeMillis()}. Packets which have timestamps with
+     * larger deviations than this will be rejected.
+     */
     public static final long MAX_CLOCK_DEVIATION = (60 * 1000) * 5;
     
+    /**
+     * Disables encryption for debugging reasons. This should
+     * <strong>never</strong> be {@code true} in a production release.
+     */
     public static final boolean DEBUG_NO_ENCRYPTION = false;
+    
+    /**
+     * Disables compression for debugging reasons. This should
+     * <strong>never</strong> be {@code true} in a production release.
+     */
     public static final boolean DEBUG_NO_COMPRESSION = false;
     
     private Socket socket;
@@ -50,6 +76,14 @@ public class TTTWConnection {
     private long lastPacket;
     private boolean keepAliveSent;
     
+    /**
+     * Creates a new TTTW-compliant connection on top of the given socket.
+     * 
+     * @param socket The socket on which this connection should operate.
+     * 
+     * @throws IOException There was an error opening the input or output
+     *             streams on the given socket.
+     */
     public TTTWConnection(Socket socket) throws IOException {
         this.socket = socket;
         this.input = new DataInputStream(socket.getInputStream());
@@ -60,14 +94,39 @@ public class TTTWConnection {
         this.lastPacket = System.currentTimeMillis();
     }
     
+    /**
+     * Gets the amount of time (in milliseconds) since the last packet was
+     * processed.
+     * 
+     * @return The amount of time since the last processed packet.
+     */
     public long getTimeSinceLastPacket() {
         return System.currentTimeMillis() - this.lastPacket;
     }
     
+    /**
+     * Gets a value indicating whether a {@link PacketKeepAlive} has been sent
+     * since the last packet was processed from this connection.
+     * 
+     * @return Whether a {@link PacketKeepAlive} has been sent to this
+     *         connection since the last received packet.
+     */
     public boolean getKeepAliveSentSinceLastPacket() {
         return this.keepAliveSent;
     }
     
+    /**
+     * Sets the default handler for the given type of packet. The default
+     * handler for a packet is used only when no filtered handler is capable of
+     * handling the packet.
+     * 
+     * @param <P> The type of packet being handled.
+     * 
+     * @param packetType The type of packet for which to set the default
+     *            handler.
+     * @param handler The default handler which should be used for the given
+     *            packet type.
+     */
     @SuppressWarnings("unchecked")
     public synchronized <P extends Packet> void setDefaultHandler(Class<P> packetType, PacketHandler<P> handler) {
         if (!this.handlers.containsKey(packetType)) {
@@ -87,6 +146,22 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Adds a filtered handler for the given type of packet. A filtered handler
+     * is preferred over the default handler for a specific type of packet if
+     * the filtered handler is capable of handling the packet. If multiple
+     * filtered handlers are capable of handling a packet, it is
+     * <em>undefined</em> which handler is used.
+     * 
+     * @param <P> The type of packet being handled.
+     * 
+     * @param packetType The type of packet for which a filtered handler should
+     *            be added.
+     * @param filter The filter that should be used to filter packets destined
+     *            for this handler.
+     * @param handler The handler which should be executed for any packets
+     *            matching the given filter.
+     */
     @SuppressWarnings("unchecked")
     public synchronized <P extends Packet> void addFilteredHandler(Class<P> packetType, PacketFilter<? super P> filter,
             PacketHandler<P> handler) {
@@ -100,6 +175,17 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Removes a filtered handler for the given type of packet. If the handler
+     * provided is not a filtered handler for the given type of packet, no
+     * action is taken.
+     * 
+     * @param <P> The type of packet being handled.
+     * 
+     * @param packetType The type of packet for which a filtered handler should
+     *            be removed.
+     * @param handler The filtered handler that should be removed.
+     */
     @SuppressWarnings("unchecked")
     public synchronized <P extends Packet> void removeFilteredHandler(Class<P> packetType, PacketHandler<P> handler) {
         if (this.handlers.containsKey(packetType)) {
@@ -112,28 +198,73 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Adds a new disconnection listener to this connection. Disconnection
+     * listeners will be executed in the order in which they were added when a
+     * client disconnects or is disconnected. Adding the same handler multiple
+     * times to a single connection is not allowed, and will be ignored.
+     * 
+     * @param l The disconnection listener which should be added to this
+     *            connection.
+     */
     public synchronized void addDisconnectListener(DisconnectListener l) {
         if (!this.disconnectListeners.contains(l)) {
             this.disconnectListeners.add(l);
         }
     }
     
+    /**
+     * Removes a disconnection listener from this connection. If the given
+     * disconnection listener is not listening on this connection, no action is
+     * taken.
+     * 
+     * @param l The disconnection listener which should be removed from this
+     *            connection.
+     */
     public synchronized void removeDisconnectListener(DisconnectListener l) {
         this.disconnectListeners.remove(l);
     }
     
+    /**
+     * Gets the IP address and remote port of this connection in a
+     * human-readable format.
+     * 
+     * @return A string representing the IP address and remote port of this
+     *         connection.
+     */
     public String getAddress() {
         return this.socket.getInetAddress() + ":" + this.socket.getPort();
     }
     
+    /**
+     * Checks whether encryption is currently enabled for outgoing packets on
+     * this connection. If {@code true}, encrypted packets can be received and
+     * decrypted and all outgoing packets will be encrypted. If {@code false},
+     * encrypted packets cannot be received or sent using this connection.
+     * 
+     * @return Whether or not encryption is currently enabled on this
+     *         connection.
+     */
     public boolean isEncrypted() {
         return this.cryptKey != null;
     }
     
+    /**
+     * Gets the current encryption key being used to encrypt and decrypt packets
+     * by this connection.
+     * 
+     * @return The AES-128 encryption key currently in use by this connection.
+     */
     public byte[] getEncryptionKey() {
         return this.cryptKey;
     }
     
+    /**
+     * Generates a new, random, 128-bit encryption key. This method <strong>does
+     * not</strong> change the encryption key being used by this connection.
+     * 
+     * @return A random 128-bit encryption key.
+     */
     public byte[] generateEncryptionKey() {
         byte[] key = new byte[16];
         this.cryptRandom.nextBytes(key);
@@ -141,14 +272,34 @@ public class TTTWConnection {
         return key;
     }
     
+    /**
+     * Sets the encryption key in use by this connection for encrypting and
+     * decrypting packets.
+     * 
+     * @param key The AES-128 key to be used for packet encryption and
+     *            decryption, or {@code null} to disable packet
+     *            encryption/decryption.
+     */
     public synchronized void setEncryptionKey(byte[] key) {
         this.cryptKey = key;
     }
     
+    /**
+     * Gets the minimum size of a JSON payload (in bytes) that will be gzip
+     * compressed before being sent.
+     * 
+     * @return The minimum packet size before packets are compressed.
+     */
     public int getCompressionThreshold() {
         return this.compressThreshold;
     }
     
+    /**
+     * Sets the minimum size of a JSON payload (in bytes) that will be gzip
+     * compressed before being sent.
+     * 
+     * @param compressThreshold The new compression threshold.
+     */
     public synchronized void setCompressionThreshold(int compressThreshold) {
         this.compressThreshold = compressThreshold;
     }
@@ -177,6 +328,15 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Sends a packet to this connection. The packet may be gzip compressed
+     * and/or encrypted before being sent depending on the settings of this
+     * connection. If this connection is already closed, no action will be
+     * taken.
+     * 
+     * @param p The packet that should be sent to this connection.
+     * @throws IOException An error occured while sending the packet.
+     */
     public synchronized void sendPacket(Packet p) throws IOException {
         this.sendPacketInternal(p);
     }
@@ -198,7 +358,7 @@ public class TTTWConnection {
                 
                 return byteOut.toByteArray();
             }
-        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+        } catch (CryptoException e) {
             throw new IOException("Bad encryption on packet!", e);
         }
     }
@@ -216,11 +376,19 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Checks whether a packet is waiting to be handled.
+     * 
+     * @return {@code true} if there is data waiting on the input stream;
+     *         {@code false} otherwise.
+     * @throws IOException An error occurred while polling the input stream for
+     *             new data.
+     */
     public synchronized boolean isPacketWaiting() throws IOException {
         return this.input.available() > 0;
     }
     
-    public synchronized Packet receivePacket() throws IOException {
+    private synchronized Packet receivePacket() throws IOException {
         int l;
         
         if (this.packetBuffer == null) {
@@ -273,7 +441,7 @@ public class TTTWConnection {
         
         try {
             return this.readPacket(Crypto.decryptSymmetric(encrypted, start + 16, this.cryptKey, iv), 0);
-        } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+        } catch (CryptoException e) {
             throw new IOException("Bad encryption on packet!", e);
         }
     }
@@ -286,11 +454,19 @@ public class TTTWConnection {
         return Packet.readPacket(new String(p, start, p.length - start, StandardCharsets.UTF_8));
     }
     
+    /**
+     * Handles the next packet on this connection's input stream. If the packet
+     * could not be fully read, the currently read buffer will be stored and
+     * another attempt to read the remaining data will be made on the next call.
+     * 
+     * @throws IOException An error occurred while reading or handling the
+     *             packet.
+     */
     public void handleNextPacket() throws IOException {
         this.handlePacket(this.receivePacket());
     }
     
-    public void handlePacket(Packet p) throws IOException {
+    private void handlePacket(Packet p) throws IOException {
         if (p == null) {
             return;
         } else if (handlers.containsKey(p.getClass())) {
@@ -335,6 +511,10 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Closes this connection, preventing any further data from being sent to
+     * it.
+     */
     public void close() {
         try {
             this.socket.close();
@@ -347,6 +527,13 @@ public class TTTWConnection {
         this.output = null;
     }
     
+    /**
+     * Disconnects this connection with the given disconnection message. Before
+     * the actual disconnection, any {@link DisconnectListener}s on this
+     * connections will be called.
+     * 
+     * @param message The message which should be sent when disconnecting.
+     */
     public void disconnect(String message) {
         try {
             for (DisconnectListener listener : new ArrayList<DisconnectListener>(TTTWConnection.this.disconnectListeners)) {
@@ -363,19 +550,75 @@ public class TTTWConnection {
         }
     }
     
+    /**
+     * Checks whether this connection is still alive and capable of sending and
+     * receiving packets.
+     * 
+     * @return {@code true} if this connection is still alive; {@code false}
+     *         otherwise.
+     */
     public boolean isAlive() {
         return this.socket != null && !this.socket.isClosed();
     }
     
+    /**
+     * Represents a handler for a specific type of packet. May or may not have
+     * packets filtered based on how it is registered.
+     * 
+     * @param <P> The type of packet that this handler is capable of handling.
+     * 
+     * @author Ben Thomas
+     */
     public interface PacketHandler<P extends Packet> {
+        /**
+         * Handles the given packet, performing any necessary action.
+         * 
+         * @param packet The packet to be handled.
+         * @throws IOException An error occurred while handling the packet.
+         */
         public void handlePacket(P packet) throws IOException;
     }
     
+    /**
+     * Represents a filter that is capable of deciding which packets should be
+     * passed onto a given handler and which should not.
+     * 
+     * @param <P> The type of packet that this filter is capable of filtering.
+     *
+     * @author Ben Thomas
+     */
     public interface PacketFilter<P extends Packet> {
+        /**
+         * Checks whether the given packet should be passed onto the associated
+         * {@link PacketHandler}.
+         * 
+         * @param packet The packet which should be checked for filtering.
+         * @return {@code false} if the handler associated with this filter
+         *         should handle the given packet; {@code true} otherwise.
+         */
         public boolean isFiltered(P packet);
     }
     
+    /**
+     * Represents a listener that listens for a specific connection to either
+     * send a {@link PacketDisconnect} or be disconnected by the
+     * {@link TTTWConnection#disconnect(String)} method.
+     *
+     * @author Ben Thomas
+     */
     public interface DisconnectListener {
+        /**
+         * Notifies this listener that the associated connection has
+         * disconnected or is being disconnected. Unless some form of recursion
+         * protection is in place, this method <strong>must never</strong> cause
+         * the associated connection to be disconnected.
+         * 
+         * @param fromRemote {@code true} if this event was the result of a
+         *            {@link PacketDisconnect} being received; {@code false} if
+         *            this event is the result of a call to
+         *            {@link TTTWConnection#disconnect(String)}.
+         * @param reason The reason that was provided for the disconnection.
+         */
         public void onDisconnect(boolean fromRemote, String reason);
     }
     

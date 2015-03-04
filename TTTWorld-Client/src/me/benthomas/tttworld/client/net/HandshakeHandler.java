@@ -1,19 +1,17 @@
 package me.benthomas.tttworld.client.net;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import me.benthomas.tttworld.Crypto;
+import me.benthomas.tttworld.Crypto.CryptoException;
 import me.benthomas.tttworld.client.KnownHosts;
 import me.benthomas.tttworld.net.PacketAuthResult;
 import me.benthomas.tttworld.net.PacketServerHandshake;
@@ -43,8 +41,7 @@ public class HandshakeHandler implements PacketHandler<PacketServerHandshake> {
                     try {
                         HandshakeHandler.this.server.sendPacket(new PacketStartEncrypt(Crypto.encryptAsymmetric(key,
                                 HandshakeHandler.this.decodePublicKey(packet.getPublicKey()))));
-                    } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException
-                            | NoSuchAlgorithmException e) {
+                    } catch (CryptoException | InvalidKeySpecException | NoSuchAlgorithmException e) {
                         HandshakeHandler.this.server.disconnect("Error securing encryption key");
                         return;
                     }

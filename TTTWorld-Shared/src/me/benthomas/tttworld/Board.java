@@ -20,6 +20,12 @@ public class Board {
         this.clear();
     }
     
+    /**
+     * Parses a board from a given string included in a JSON-serialized packet.
+     * 
+     * @param jsonString The serialized string version of the board that should
+     *            be decoded.
+     */
     public Board(String jsonString) {
         this.marks = new Mark[3 * 3];
         
@@ -159,6 +165,13 @@ public class Board {
         }
     }
     
+    /**
+     * Creates a string representation of this board that can be sent in a
+     * JSON-encoded packet to convey this board to other TTTW-compliant
+     * endpoints.
+     * 
+     * @return A string representation of this board.
+     */
     public String toJsonString() {
         StringBuilder b = new StringBuilder();
         
