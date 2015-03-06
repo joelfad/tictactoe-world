@@ -16,16 +16,29 @@ import me.benthomas.tttworld.net.TTTWConnection.PacketFilter;
 import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A class which manages games and challenges currently active on this server.
+ *
+ * @author Ben Thomas
+ */
 public class GameManager {
     private long challengeTimeout;
     
     private HashMap<UUID, Challenge> challenges = new HashMap<UUID, Challenge>();
     private HashMap<UUID, Game> games = new HashMap<UUID, Game>();
     
-    public GameManager(long challengeTimeout) {
+    GameManager(long challengeTimeout) {
         this.challengeTimeout = challengeTimeout;
     }
     
+    /**
+     * Creates a new challenge and notifies the receiver that they have been
+     * sent a challenge.
+     * 
+     * @param sender The client that has sent the challenge.
+     * @param receiver The client who is being challenged.
+     * @return The challenge which was created.
+     */
     public synchronized Challenge sendChallenge(TTTWClientConnection sender, TTTWClientConnection receiver) {
         try {
             Challenge c = new Challenge(UUID.randomUUID(), System.currentTimeMillis() + this.challengeTimeout + 1000, sender,
@@ -41,6 +54,15 @@ public class GameManager {
         }
     }
     
+    /**
+     * Checks whether there is already a challenge pending between the two
+     * provided clients.
+     * 
+     * @param sender The client sender to check for.
+     * @param receiver The client receiver to check for.
+     * @return {@code true} if a challenge exists between the two provided
+     *         players; otherwise, {@code false}.
+     */
     public synchronized boolean doesChallengeExist(TTTWClientConnection sender, TTTWClientConnection receiver) {
         for (Entry<UUID, Challenge> c : this.challenges.entrySet()) {
             if (c.getValue().sender == sender && c.getValue().receiver == receiver) {
@@ -51,6 +73,11 @@ public class GameManager {
         return false;
     }
     
+    /**
+     * Causes the given challenge to be rejected by the receiver.
+     * 
+     * @param challengeId The ID of the challenge to be rejected.
+     */
     public synchronized void rejectChallenge(UUID challengeId) {
         Challenge c = this.challenges.get(challengeId);
         
@@ -59,6 +86,14 @@ public class GameManager {
         }
     }
     
+    /**
+     * Causes the given challenge to be accepted by the receiver. Creates a new
+     * game based on the given challenge.
+     * 
+     * @param challengeId The ID of the challenge that should be accepted.
+     * @return The game which was created, or {@code null} if the given
+     *         challenge was not found.
+     */
     public synchronized Game acceptChallenge(UUID challengeId) {
         Challenge c = this.challenges.get(challengeId);
         
@@ -72,17 +107,27 @@ public class GameManager {
         }
     }
     
+    /**
+     * Creates a new game between the two players. One of the players must be
+     * configured to play with X's and the other must be configured to player
+     * with O's. The game is automatically started by calling
+     * {@link Game#tick()} once.
+     * 
+     * @param gameId The ID of the game which should be created.
+     * @param player1 One of the players of this game.
+     * @param player2 The other player of this game.
+     * @return The newly created games.
+     */
     public synchronized Game createGame(UUID gameId, Player player1, Player player2) {
         Game g;
         
-        if (player1.getMark() == Mark.X && player2.getMark() == Mark.O) { 
+        if (player1.getMark() == Mark.X && player2.getMark() == Mark.O) {
             g = new Game(gameId, player1, player2);
         } else if (player1.getMark() == Mark.O && player2.getMark() == Mark.X) {
             g = new Game(gameId, player2, player1);
         } else {
             throw new IllegalArgumentException("Two players playing with the same mark?");
         }
-        
         
         this.games.put(gameId, g);
         
@@ -91,10 +136,21 @@ public class GameManager {
         return g;
     }
     
+    /**
+     * Gets the existing game with the given game ID.
+     * 
+     * @param gameId The ID of the game to be found.
+     * @return The game with the given ID or {@code null} if no game exists with
+     *         the given game ID.
+     */
     public synchronized Game getGame(UUID gameId) {
         return this.games.get(gameId);
     }
     
+    /**
+     * Causes all existing challenges to be ticked and removed if they have
+     * expired.
+     */
     public synchronized void tick() {
         Iterator<Entry<UUID, Challenge>> challengeIterator = this.challenges.entrySet().iterator();
         
@@ -118,18 +174,39 @@ public class GameManager {
         }
     }
     
+    /**
+     * Represents a pending challenge between two players.
+     *
+     * @author Ben Thomas
+     */
     public class Challenge {
+        
+        /**
+         * The unique ID of this challenge.
+         */
         public final UUID id;
+        
+        /**
+         * The millisecond at which this challenge will expire, as compared to
+         * {@link System#currentTimeMillis()}.
+         */
         public final long expires;
         
+        /**
+         * The client that sent this challenge.
+         */
         public final TTTWClientConnection sender;
+        
+        /**
+         * The client to which this challenge was sent.
+         */
         public final TTTWClientConnection receiver;
         
         private boolean stopped = false;
         private ChallengeDisconnectListener disconnectListener;
         private ChallengeResponseHandler responseHandler;
         
-        public Challenge(UUID id, long expires, TTTWClientConnection sender, TTTWClientConnection receiver) {
+        private Challenge(UUID id, long expires, TTTWClientConnection sender, TTTWClientConnection receiver) {
             this.id = id;
             this.expires = expires;
             

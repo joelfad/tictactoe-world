@@ -5,6 +5,14 @@ import java.io.IOException;
 import me.benthomas.tttworld.server.Account;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command which unbans the specified user and allows them to reconnect. Has a
+ * syntax of <code>:unban &lt;player&gt;</code>.
+ * <p>
+ * Can only be executed by a user who is an administrator on this server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandUnban implements Command {
     
     @Override

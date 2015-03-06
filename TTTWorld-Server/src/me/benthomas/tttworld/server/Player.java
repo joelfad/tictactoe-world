@@ -24,21 +24,37 @@ public abstract class Player {
         this.mark = mark;
     }
     
+    /**
+     * Notifies this player that the game has just started. Should be
+     * immediately followed by a call to {@link #notifyUpdate(boolean)}.
+     */
     public abstract void notifyStart();
     
     /**
-     * Causes the player to make a move on their board. A board must be set
-     * before a move can be made.
+     * Notifies this player that the board has been updated. If requested, the
+     * player will be told that they must make a move.
      * 
-     * @throws UnsupportedOperationException If a board has not yet been set.
+     * @param myTurn Whether this player should make the next move.
      */
     public abstract void notifyUpdate(boolean myTurn);
     
+    /**
+     * Notifies this player that the game is over and that they have won.
+     */
     public abstract void notifyWon();
+    
+    /**
+     * Notifies this player that the game is over and that they have lost.
+     */
     public abstract void notifyLost();
+    
+    /**
+     * Notifies this player that the game is over and that the result of the
+     * game was a draw.
+     */
     public abstract void notifyDrawn();
     
-    public final void setGame(Game game) {
+    final void setGame(Game game) {
         this.game = game;
     }
     

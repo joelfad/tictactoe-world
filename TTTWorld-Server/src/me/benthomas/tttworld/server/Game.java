@@ -22,6 +22,10 @@ public class Game {
     
     /**
      * Creates a new game of tic-tac-toe, with a blank board.
+     * 
+     * @param id The unique ID of this game.
+     * @param xPlayer The player who is playing with X's.
+     * @param oPlayer The player who is playing with O's.
      */
     public Game(UUID id, Player xPlayer, Player oPlayer) {
         this.id = id;
@@ -37,6 +41,11 @@ public class Game {
         this.oPlayer = oPlayer;
     }
     
+    /**
+     * Gets the unique ID of this game.
+     * 
+     * @return The unique ID of this game.
+     */
     public UUID getId() {
         return this.id;
     }
@@ -50,26 +59,56 @@ public class Game {
         return this.board;
     }
     
+    /**
+     * Gets the player who is playing with X's.
+     * 
+     * @return The X player.
+     */
     public Player getPlayerX() {
         return this.xPlayer;
     }
     
+    /**
+     * Gets the player who is playing with O's.
+     * 
+     * @return The O player.
+     */
     public Player getPlayerO() {
         return this.oPlayer;
     }
     
+    /**
+     * Gets the player that this game is currently waiting on for a move.
+     * 
+     * @return The active player of this game.
+     */
     public Player getActivePlayer() {
         return (this.turn) ? this.oPlayer : this.xPlayer;
     }
     
+    /**
+     * Gets the player that is not currently being waited on.
+     * 
+     * @return The inactive player of this game.
+     */
     public Player getInactivePlayer() {
         return (this.turn) ? this.xPlayer : this.oPlayer;
     }
     
+    /**
+     * Gets a value indicating whether this game has been completed.
+     * 
+     * @return Whether this game is over.
+     */
     public boolean isDone() {
         return this.done;
     }
     
+    /**
+     * Causes the game to move onto the next turn. If a player has won or the
+     * board is full, the game is terminated; otherwise, the next player is
+     * notified that it's their turn.
+     */
     public synchronized void tick() {
         if (this.board.hasWon(Mark.X)) {
             this.done = true;
@@ -91,6 +130,13 @@ public class Game {
         }
     }
     
+    /**
+     * Causes the game to be cancelled with the opposing player to the provided
+     * loser being the winner.
+     * 
+     * @param loser The player who has caused the game to be cancelled, and is
+     *            thus the loser of the game.
+     */
     public synchronized void cancel(Player loser) {
         this.done = true;
         

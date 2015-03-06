@@ -23,6 +23,14 @@ public final class NetPlayer extends Player {
     private GameMoveHandler moveHandler;
     private DisconnectForfeiter forfeit;
     
+    /**
+     * Creates a new networked player bound to the given client and playing
+     * using the given mark.
+     * 
+     * @param client The client to which this networked player should be bound
+     *            to.
+     * @param mark The mark with which this player should play.
+     */
     public NetPlayer(TTTWClientConnection client, Mark mark) {
         super(client.getAccount().getName(), mark);
         
@@ -32,6 +40,11 @@ public final class NetPlayer extends Player {
         this.forfeit = new DisconnectForfeiter();
     }
     
+    /**
+     * Gets the client to which this networked player is bound.
+     * 
+     * @return The client to which this networked player is bound.
+     */
     public TTTWClientConnection getClient() {
         return this.client;
     }
@@ -95,7 +108,7 @@ public final class NetPlayer extends Player {
         this.client.removeDisconnectListener(this.forfeit);
     }
     
-    public void handlePacket(PacketGameMove p, boolean active) {
+    private void handlePacket(PacketGameMove p, boolean active) {
         if (p.getX() == -1 && p.getY() == -1) {
             this.game.cancel(this);
         } else if (active && p.getX() >= 0 && p.getX() < 3 && p.getY() >= 0 && p.getY() < 3) {
@@ -106,21 +119,21 @@ public final class NetPlayer extends Player {
         }
     }
     
-    public class GameMoveFilter implements PacketFilter<PacketGameMove> {
+    private class GameMoveFilter implements PacketFilter<PacketGameMove> {
         @Override
         public boolean isFiltered(PacketGameMove packet) {
             return !packet.getGameId().equals(NetPlayer.this.game.getId());
         }
     }
     
-    public class GameMoveHandler implements PacketHandler<PacketGameMove> {
+    private class GameMoveHandler implements PacketHandler<PacketGameMove> {
         @Override
         public void handlePacket(PacketGameMove packet) throws IOException {
             NetPlayer.this.handlePacket(packet, NetPlayer.this.game.getActivePlayer() == NetPlayer.this);
         }
     }
     
-    public class DisconnectForfeiter implements DisconnectListener {
+    private class DisconnectForfeiter implements DisconnectListener {
         @Override
         public void onDisconnect(boolean fromRemote, String reason) {
             NetPlayer.this.game.cancel(NetPlayer.this);

@@ -4,6 +4,14 @@ import java.io.IOException;
 
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command which halts the server and disconnects all connected clients. Has a
+ * syntax of <code>:stop</code>.
+ * <p>
+ * Can only be executed by a user who is an administrator on this server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandStop implements Command {
     
     @Override

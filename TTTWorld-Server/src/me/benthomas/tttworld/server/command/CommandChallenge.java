@@ -4,6 +4,14 @@ import java.io.IOException;
 
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command used to send a new tic-tac-toe challenge to the specified user. Has
+ * a syntax of <code>:challenge &lt;player&gt;</code>.
+ * <p>
+ * Can be executed by any user on the server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandChallenge implements Command {
     
     @Override

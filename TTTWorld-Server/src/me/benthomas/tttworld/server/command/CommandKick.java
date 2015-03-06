@@ -4,6 +4,15 @@ import java.io.IOException;
 
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command which kicks the specified user from the server. Has a syntax of
+ * <code>:kick &lt;player&gt;</code> and does not prevent the client from
+ * reconnecting in any way.
+ * <p>
+ * Can only be executed by a user who is an administrator on this server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandKick implements Command {
     
     @Override

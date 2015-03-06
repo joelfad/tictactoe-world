@@ -11,9 +11,29 @@ import me.benthomas.tttworld.net.TTTWConnection.DisconnectListener;
 import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 import me.benthomas.tttworld.server.Account;
 
+/**
+ * A class which is capable of handling {@link PacketAuthenticate}s from a
+ * client and attempts to authenticate them. When the attempt is complete, a
+ * {@link PacketAuthResult} is sent back to the client.
+ * <p>
+ * If the attempt is successful, normal operation is enabled for the client and
+ * all regular handlers are automatically registered on the client.
+ *
+ * @author Ben Thomas
+ */
 public class AuthenticateHandler implements PacketHandler<PacketAuthenticate> {
     private TTTWClientConnection client;
     
+    /**
+     * Causes the specified client to enter normal operation after having
+     * authenticated successfully. All other connected users are also notified
+     * about the new user.
+     * 
+     * @param client The client which has been successfully authenticated.
+     * @throws IOException An unrecoverable error occurred while initialising
+     *             the user. Throwing this should cause the user to be
+     *             disconnected.
+     */
     public static void onAuthenticated(TTTWClientConnection client) throws IOException {
         client.setDefaultHandler(PacketAuthenticate.class, null);
         client.setDefaultHandler(PacketRegister.class, null);
@@ -26,6 +46,13 @@ public class AuthenticateHandler implements PacketHandler<PacketAuthenticate> {
         client.getServer().sendPlayerList();
     }
     
+    /**
+     * Constructs a new authentication handler which can handle authentication
+     * for the given client.
+     * 
+     * @param client The client for which this handler should handle
+     *            authentication attempts.
+     */
     public AuthenticateHandler(TTTWClientConnection client) {
         this.client = client;
     }

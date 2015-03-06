@@ -10,9 +10,23 @@ import me.benthomas.tttworld.net.TTTWConnection;
 import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 import me.benthomas.tttworld.server.Server;
 
+/**
+ * A class which is capable of handling the beginning
+ * {@link PacketClientHandshake} of the handshake process. Automatically replies
+ * to the client with a {@link PacketServerHandshake} and enters the
+ * authentication phase of the handshake.
+ *
+ * @author Ben Thomas
+ */
 public final class HandshakeHandler implements PacketHandler<PacketClientHandshake> {
     private final TTTWClientConnection client;
     
+    /**
+     * Creates a new client handshake packet handler for the given client.
+     * 
+     * @param client The client for which this handler should handle handshake
+     *            packets.
+     */
     public HandshakeHandler(TTTWClientConnection client) {
         this.client = client;
     }

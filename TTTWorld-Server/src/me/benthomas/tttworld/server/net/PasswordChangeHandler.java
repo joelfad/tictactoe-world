@@ -8,9 +8,23 @@ import me.benthomas.tttworld.net.PacketPasswordChangeResult.Result;
 import me.benthomas.tttworld.net.TTTWConnection.PacketHandler;
 import me.benthomas.tttworld.server.Account;
 
+/**
+ * A class which is capable of handling password change and reset attempts sent
+ * by clients as {@link PacketPasswordChange}s. Changes/resets the requested
+ * password and automatically sends back a {@link PacketPasswordChangeResult}
+ * with the result.
+ *
+ * @author Ben Thomas
+ */
 public class PasswordChangeHandler implements PacketHandler<PacketPasswordChange> {
     private TTTWClientConnection client;
     
+    /**
+     * Creates a new password change/reset handler for the given client.
+     * 
+     * @param client The client for which this handler should handle password
+     *            change/reset attempts.
+     */
     public PasswordChangeHandler(TTTWClientConnection client) {
         this.client = client;
     }

@@ -29,13 +29,25 @@ import me.benthomas.tttworld.net.PacketKeepAlive;
 import me.benthomas.tttworld.net.TTTWConnection;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * Represents a TTTW-compliant Tic-Tac-Toe server.
+ *
+ * @author Ben Thomas
+ */
 public class Server {
-    public static final int PACKET_HANDLE_THREADS = 3;
-    public static final long DISPATCH_PERIOD = 50;
+    private static final int PACKET_HANDLE_THREADS = 3;
+    private static final long DISPATCH_PERIOD = 50;
     
-    public static final long KEEP_ALIVE_SEND_TIME = 20000;
-    public static final long KEEP_ALIVE_DISCONNECT_TIME = 30000;
+    private static final long KEEP_ALIVE_SEND_TIME = 20000;
+    private static final long KEEP_ALIVE_DISCONNECT_TIME = 30000;
     
+    /**
+     * Starts a server using the given command-line arguments.
+     * 
+     * @param args Command-line arguments to pass to the server.
+     * @throws IOException An unrecoverable error has occurred while loading
+     *             server properties.
+     */
     public static void main(String[] args) throws IOException {
         Properties p = new Properties();
         
@@ -63,7 +75,7 @@ public class Server {
     
     private KeyPair keyPair;
     
-    public Server(Properties p) {
+    private Server(Properties p) {
         try {
             this.accountManager = new AccountManager();
         } catch (IOException e) {
@@ -143,38 +155,86 @@ public class Server {
         return Crypto.formatFingerprint(Crypto.calculateSHA1(this.getEncodedPublicKey()));
     }
     
+    /**
+     * Gets the key pair that this server is using for security.
+     * 
+     * @return The RSA key pair of this server.
+     */
     public KeyPair getKeyPair() {
         return this.keyPair;
     }
     
+    /**
+     * Gets this server's RSA public key in an encoded format to be sent to a
+     * client.
+     * 
+     * @return This server's RSA in an encoded format to be sent to a client.
+     */
     public byte[] getEncodedPublicKey() {
         return new X509EncodedKeySpec(this.keyPair.getPublic().getEncoded()).getEncoded();
     }
     
+    /**
+     * Gets this server's account manager.
+     * 
+     * @return This server's account manager.
+     */
     public AccountManager getAccountManager() {
         return this.accountManager;
     }
     
+    /**
+     * Gets this server's game manager.
+     * 
+     * @return This server's game manager.
+     */
     public GameManager getGameManager() {
         return this.gameManager;
     }
     
+    /**
+     * Gets the name of this server as it should be sent to clients.
+     * 
+     * @return This server's name.
+     */
     public String getName() {
         return this.serverName;
     }
     
+    /**
+     * Gets the compression thershold used by this server.
+     * 
+     * @return This server's compression threshold.
+     */
     public int getCompressionThreshold() {
         return this.compressThreshold;
     }
     
+    /**
+     * Checks whether self-registration is allowed on this server.
+     * 
+     * @return Whether this server allows self-registration of user accounts.
+     */
     public boolean isRegistrationAllowed() {
         return this.allowRegister;
     }
     
+    /**
+     * Gets a list of clients that are currently connected to this server.
+     * 
+     * @return A list of connected clients.
+     */
     public List<TTTWClientConnection> getConnectedPlayers() {
         return this.connectedPlayers;
     }
     
+    /**
+     * Gets the client connection authenticated as a given account.
+     * 
+     * @param a The account to find the authenticated client for.
+     * @return The client authenticated as the provided user account, or
+     *         {@code null} if that user is not connected.
+     */
     public TTTWClientConnection getPlayer(Account a) {
         synchronized (this.connectedPlayers) {
             for (TTTWClientConnection player : this.connectedPlayers) {
@@ -187,6 +247,14 @@ public class Server {
         return null;
     }
     
+    /**
+     * Gets the client connection authenticated as a user account with the given
+     * name.
+     * 
+     * @param name The name of the user account to find the client of.
+     * @return The client authenticated as the user account with the given name,
+     *         or {@code null} if that user is not connected.
+     */
     public TTTWClientConnection getPlayer(String name) {
         synchronized (this.connectedPlayers) {
             for (TTTWClientConnection player : this.connectedPlayers) {
@@ -199,6 +267,12 @@ public class Server {
         return null;
     }
     
+    /**
+     * Sends a global chat broadcast to all players who are currently connected
+     * to this server.
+     * 
+     * @param message The message to be broadcast to all connected clients.
+     */
     public void sendGlobalBroadcast(String message) {
         synchronized (this.connectedPlayers) {
             for (TTTWClientConnection player : this.connectedPlayers) {
@@ -213,6 +287,10 @@ public class Server {
         }
     }
     
+    /**
+     * Broadcasts the current list of connected players to all connected
+     * clients.
+     */
     public void sendPlayerList() {
         HashMap<TTTWClientConnection, Account> players = new HashMap<TTTWClientConnection, Account>();
         
@@ -244,7 +322,7 @@ public class Server {
         }
     }
     
-    public void start(int port) throws IOException {
+    private void start(int port) throws IOException {
         this.acceptSocket = new ServerSocket(port);
         
         this.clientAccepter = new ClientAcceptThread();
@@ -264,6 +342,10 @@ public class Server {
         }
     }
     
+    /**
+     * Stops the server, causing all packet handler threads, the dispatch
+     * thread, and the client accepter thread to be stopped.
+     */
     public void stop() {
         this.clientAccepter.interrupt();
         

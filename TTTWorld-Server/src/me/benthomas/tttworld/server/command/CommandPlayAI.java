@@ -10,6 +10,16 @@ import me.benthomas.tttworld.server.ai.AIPlayerRandom;
 import me.benthomas.tttworld.server.ai.AIPlayerSmart;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command which causes the creation of a new game against an AI opponent. Has
+ * a syntax of <code>:playai {random|blocking|smart} {x|o}</code>, with the
+ * first argument indicating the behaviour of the AI and the second argument
+ * indicating which mark the player will place.
+ * <p>
+ * Can be executed by any user on the server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandPlayAI implements Command {
     
     private void sendSyntax(TTTWClientConnection client) {
@@ -42,11 +52,14 @@ public class CommandPlayAI implements Command {
         }
         
         if (args[1].equalsIgnoreCase("random")) {
-            client.getServer().getGameManager().createGame(UUID.randomUUID(), new NetPlayer(client, playerMark), new AIPlayerRandom("AI", aiMark));
+            client.getServer().getGameManager()
+                    .createGame(UUID.randomUUID(), new NetPlayer(client, playerMark), new AIPlayerRandom("AI", aiMark));
         } else if (args[1].equalsIgnoreCase("blocking")) {
-            client.getServer().getGameManager().createGame(UUID.randomUUID(), new NetPlayer(client, playerMark), new AIPlayerBlocking("AI", aiMark));
+            client.getServer().getGameManager()
+                    .createGame(UUID.randomUUID(), new NetPlayer(client, playerMark), new AIPlayerBlocking("AI", aiMark));
         } else if (args[1].equalsIgnoreCase("smart")) {
-            client.getServer().getGameManager().createGame(UUID.randomUUID(), new NetPlayer(client, playerMark), new AIPlayerSmart("AI", aiMark));
+            client.getServer().getGameManager()
+                    .createGame(UUID.randomUUID(), new NetPlayer(client, playerMark), new AIPlayerSmart("AI", aiMark));
         } else {
             this.sendSyntax(client);
             return;

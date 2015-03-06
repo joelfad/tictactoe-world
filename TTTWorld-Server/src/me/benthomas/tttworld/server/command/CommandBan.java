@@ -5,6 +5,15 @@ import java.io.IOException;
 import me.benthomas.tttworld.server.Account;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command used to ban particular users from the server. Has a syntax of
+ * <code>:ban &lt;player&gt;</code> and will also kick the specified player if
+ * they are online.
+ * <p>
+ * Can only be executed by a user who is an administrator on this server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandBan implements Command {
     
     @Override

@@ -7,6 +7,14 @@ import me.benthomas.tttworld.net.PacketAuthResult.Result;
 import me.benthomas.tttworld.server.Account;
 import me.benthomas.tttworld.server.net.TTTWClientConnection;
 
+/**
+ * A command used to promote a specified user from a regular user to an
+ * administrator. Has a syntax of <code>:promote &lt;player&gt;</code>.
+ * <p>
+ * Can only be executed by a user who is an administrator on this server.
+ *
+ * @author Ben Thomas
+ */
 public class CommandPromote implements Command {
     
     @Override
