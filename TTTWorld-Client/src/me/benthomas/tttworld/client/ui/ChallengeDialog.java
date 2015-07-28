@@ -55,8 +55,6 @@ public class ChallengeDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                ChallengeDialog.this.close();
-                
                 if (ChallengeDialog.this.packet != null && ChallengeDialog.this.parent.getServer() != null) {
                     ChallengeDialog.this.parent.getServer().sendPacket(
                             new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
@@ -88,11 +86,12 @@ public class ChallengeDialog extends JDialog {
         btnYes = new JButton("Yes");
         btnYes.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ChallengeDialog.this.close();
                 ChallengeDialog.this.parent.getServer().sendPacket(
                         new PacketChallengeResponse(ChallengeDialog.this.packet.getChallengeId(),
                                 PacketChallengeResponse.Response.ACCEPT));
                 ChallengeDialog.this.packet = null;
+                
+                ChallengeDialog.this.close();
             }
         });
         panel.add(btnYes);
