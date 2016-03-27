@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 
 import me.benthomas.tttworld.Board;
 import me.benthomas.tttworld.net.PacketGameMove;
@@ -113,18 +114,23 @@ public class GameFrame extends JFrame {
     public class GameUpdateHandler implements PacketHandler<PacketGameUpdate> {
         @Override
         public void handlePacket(PacketGameUpdate p) {
-            GameFrame.this.board = p.getBoard();
-            GameFrame.this.myTurn = p.isYourTurn();
-            
-            GameFrame.this.panel.setBoard(board);
-            
-            if (!p.isGameOver()) {
-                if (p.isYourTurn()) {
-                    GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "It's your turn!\n");
-                } else {
-                    GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "Waiting for opponent...\n");
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    GameFrame.this.board = p.getBoard();
+                    GameFrame.this.myTurn = p.isYourTurn();
+
+                    GameFrame.this.panel.setBoard(board);
+
+                    if (!p.isGameOver()) {
+                        if (p.isYourTurn()) {
+                            GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "It's your turn!\n");
+                        } else {
+                            GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "Waiting for opponent...\n");
+                        }
+                    }
                 }
-            }
+            });
         }
     }
     
@@ -138,20 +144,25 @@ public class GameFrame extends JFrame {
     public class GameOverHandler implements PacketHandler<PacketGameOver> {
         @Override
         public void handlePacket(PacketGameOver p) {
-            if (p.getResult() == Result.LOST) {
-                GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "You lost!\n");
-            } else if (p.getResult() == Result.WON) {
-                GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "You won!\n");
-            } else if (p.getResult() == Result.DRAWN) {
-                GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "It's a draw! Everybody loses!\n");
-            } else {
-                GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "Something happened?\n");
-            }
-            
-            GameFrame.this.parent.getServer().removeFilteredHandler(PacketGameUpdate.class, GameFrame.this.updateHandler);
-            GameFrame.this.parent.getServer().removeFilteredHandler(PacketGameOver.class, GameFrame.this.overHandler);
-            
-            GameFrame.this.gameId = null;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (p.getResult() == Result.LOST) {
+                        GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "You lost!\n");
+                    } else if (p.getResult() == Result.WON) {
+                        GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "You won!\n");
+                    } else if (p.getResult() == Result.DRAWN) {
+                        GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "It's a draw! Everybody loses!\n");
+                    } else {
+                        GameFrame.this.textPane.setText(GameFrame.this.textPane.getText() + "Something happened?\n");
+                    }
+
+                    GameFrame.this.parent.getServer().removeFilteredHandler(PacketGameUpdate.class, GameFrame.this.updateHandler);
+                    GameFrame.this.parent.getServer().removeFilteredHandler(PacketGameOver.class, GameFrame.this.overHandler);
+
+                    GameFrame.this.gameId = null;
+                }
+            });
         }
     }
     
