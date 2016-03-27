@@ -75,7 +75,7 @@ public class Server {
     
     private KeyPair keyPair;
     
-    private Server(Properties p) {
+    public Server(Properties p) {
         try {
             this.accountManager = new AccountManager();
         } catch (IOException e) {
@@ -322,7 +322,7 @@ public class Server {
         }
     }
     
-    private void start(int port) throws IOException {
+    public void start(int port) throws IOException {
         this.acceptSocket = new ServerSocket(port);
         
         this.clientAccepter = new ClientAcceptThread();
