@@ -480,13 +480,6 @@ public class MainFrame extends JFrame {
     public void displayServerSelectDialog() {
         if (this.serverSelect == null) {
             this.serverSelect = new ServerSelectDialog(this);
-            
-            this.serverSelect.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    System.exit(0);
-                }
-            });
         }
         
         this.serverSelect.setVisible(true);
