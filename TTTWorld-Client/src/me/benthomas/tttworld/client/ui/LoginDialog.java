@@ -53,6 +53,7 @@ public class LoginDialog extends JDialog {
         contentPane.add(lblUsername, "2, 2, right, default");
         
         usernameField = new JTextField();
+        usernameField.setName("usernameField"); // added for testing
         contentPane.add(usernameField, "4, 2, fill, default");
         usernameField.setColumns(10);
         
@@ -60,6 +61,7 @@ public class LoginDialog extends JDialog {
         contentPane.add(lblPassword, "2, 4, right, default");
         
         passwordField = new JPasswordField();
+        passwordField.setName("passwordField"); // added for testing
         contentPane.add(passwordField, "4, 4, fill, default");
         passwordField.setColumns(10);
         
@@ -68,6 +70,7 @@ public class LoginDialog extends JDialog {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         
         btnNewAccount = new JButton("New Account");
+        btnNewAccount.setName("btnNewAccount"); // added for testing
         btnNewAccount.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 LoginDialog.this.register = new CreatePasswordDialog("Register New Account", null, new Runnable() {
@@ -85,6 +88,7 @@ public class LoginDialog extends JDialog {
         buttonPanel.add(btnNewAccount);
         
         JButton btnOk = new JButton("OK");
+        btnOk.setName("OK"); // added for testing
         buttonPanel.add(btnOk);
         btnOk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +113,7 @@ public class LoginDialog extends JDialog {
     }
     
     public void close() {
-        this.setVisible(false);
+        this.dispose();
         
         if (this.register != null) {
             this.register.dispose();

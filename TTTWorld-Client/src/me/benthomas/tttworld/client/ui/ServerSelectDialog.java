@@ -50,6 +50,7 @@ public class ServerSelectDialog extends JDialog {
         contentPane.add(lblIpAddress, "2, 2, right, default");
         
         ipField = new JTextField();
+        ipField.setName("ipField"); // added for testing
         contentPane.add(ipField, "4, 2, fill, default");
         ipField.setColumns(10);
         
@@ -57,6 +58,7 @@ public class ServerSelectDialog extends JDialog {
         contentPane.add(lblPort, "2, 4, right, default");
         
         btnOk = new JButton("OK");
+        btnOk.setName("OK"); // added for testing
         btnOk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ServerSelectDialog.this.setVisible(false);
@@ -67,6 +69,7 @@ public class ServerSelectDialog extends JDialog {
         contentPane.add(btnOk, "1, 6, 4, 1, right, default");
         
         portField = new JTextField();
+        portField.setName("portField"); // added for testing
         portField.getDocument().addDocumentListener(new DocumentListener() {
             private void changed() {
                 try {

@@ -100,13 +100,21 @@ public class MainFrame extends JFrame {
     private JMenuItem mntmPromote;
     private JMenuItem mntmDemote;
     
+    private boolean reopenServerSelectDialog;
+    
+    public MainFrame() {
+        this(true);
+    }
+    
     /**
      * Create the frame.
      */
-    public MainFrame() {
+    public MainFrame(boolean reopenServerSelectDialog) {
+        this.reopenServerSelectDialog = reopenServerSelectDialog;
+        
         setTitle("Tic-Tac-Toe World");
         setMinimumSize(new Dimension(600, 500));
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(reopenServerSelectDialog ? JFrame.DO_NOTHING_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE);
         setBounds(100, 100, 600, 500);
         
         addWindowListener(new WindowAdapter() {
@@ -415,6 +423,7 @@ public class MainFrame extends JFrame {
         
         if (this.login != null) {
             this.login.close();
+            this.login.dispose();
             this.login = null;
         }
         
@@ -442,10 +451,11 @@ public class MainFrame extends JFrame {
             this.server.disconnect("User Disconnected");
             
             this.onDisconnect();
+            
+            this.closeOrDisplayServerSelect();
         }
         
         this.setVisible(false);
-        this.displayServerSelectDialog();
     }
     
     public void connectToServer(String host, int port) {
@@ -465,7 +475,7 @@ public class MainFrame extends JFrame {
             }
             
             JOptionPane.showMessageDialog(this, "Failed to connect to the server!", "Error", JOptionPane.ERROR_MESSAGE);
-            this.displayServerSelectDialog();
+            this.closeOrDisplayServerSelect();
         }
     }
     
@@ -480,6 +490,14 @@ public class MainFrame extends JFrame {
     public void displayServerSelectDialog() {
         if (this.serverSelect == null) {
             this.serverSelect = new ServerSelectDialog(this);
+            
+            this.serverSelect.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    MainFrame.this.serverSelect = null;
+                    MainFrame.this.close();
+                }
+            });
         }
         
         this.serverSelect.setVisible(true);
@@ -491,7 +509,7 @@ public class MainFrame extends JFrame {
             
             this.login.addWindowListener(new WindowAdapter() {
                 @Override
-                public void windowClosed(WindowEvent e) {
+                public void windowClosing(WindowEvent e) {
                     MainFrame.this.disconnect();
                 }
             });
@@ -503,6 +521,33 @@ public class MainFrame extends JFrame {
         
         this.login.setVisible(true);
         this.login.getUsernameField().grabFocus();
+    }
+    
+    public void close() {
+        if (this.login != null) {
+            this.login.close();
+            this.login.dispose();
+            this.login = null;
+        }
+        
+        if (this.dialog != null) {
+            this.dialog.dispose();
+            this.dialog = null;
+        }
+        
+        if (this.serverSelect != null) {
+            this.serverSelect.dispose();
+            this.serverSelect = null;
+        }
+        
+        this.dispose();
+    }
+    
+    public void closeOrDisplayServerSelect() {
+        if (reopenServerSelectDialog)
+            this.displayServerSelectDialog();
+        else
+            this.close();
     }
     
     public void displayMainFrame() {
@@ -547,7 +592,7 @@ public class MainFrame extends JFrame {
                     
                     JOptionPane
                             .showMessageDialog(null, "Disconnected from server: " + reason, "Error", JOptionPane.ERROR_MESSAGE);
-                    MainFrame.this.displayServerSelectDialog();
+                    MainFrame.this.closeOrDisplayServerSelect();
                 }
             });
         }

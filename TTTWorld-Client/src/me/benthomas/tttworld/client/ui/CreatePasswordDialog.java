@@ -48,6 +48,7 @@ public class CreatePasswordDialog extends JDialog {
         contentPane.add(lblUsername, "2, 2, right, default");
         
         usernameField = new JTextField();
+        usernameField.setName("usernameField"); // added for testing
         contentPane.add(usernameField, "4, 2, fill, default");
         usernameField.setColumns(10);
         
@@ -60,6 +61,7 @@ public class CreatePasswordDialog extends JDialog {
         contentPane.add(lblPassword, "2, 4, right, default");
         
         passwordField = new JPasswordField();
+        passwordField.setName("passwordField"); // added for testing
         contentPane.add(passwordField, "4, 4, fill, default");
         passwordField.setColumns(10);
         
@@ -67,9 +69,11 @@ public class CreatePasswordDialog extends JDialog {
         contentPane.add(lblConfirmPassword, "2, 6, right, default");
         
         confirmPasswordField = new JPasswordField();
+        confirmPasswordField.setName("confirmPasswordField"); // added for testing
         contentPane.add(confirmPasswordField, "4, 6, fill, default");
         
         JButton btnOk = new JButton("OK");
+        btnOk.setName("OK"); // added for testing
         contentPane.add(btnOk, "4, 8, right, default");
         btnOk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
